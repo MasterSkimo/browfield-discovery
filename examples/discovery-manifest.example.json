@@ -1,0 +1,44 @@
+{
+  "schema_version": "0.1.0",
+  "repository": {
+    "name": "example/orders-app",
+    "revision": "0123456789abcdef0123456789abcdef01234567",
+    "analyzed_at": "2026-11-07T00:00:00Z"
+  },
+  "status": "needs_investigation",
+  "outputs": {
+    "agent_instructions": "AGENTS.md",
+    "architecture": ".agent-context/architecture.md",
+    "execution": ".agent-context/execution.md",
+    "dependencies": ".agent-context/dependencies.md",
+    "e2e_inventory": ".agent-context/e2e-inventory.md",
+    "unknowns": ".agent-context/unknowns.md",
+    "verification_contract": ".agent-context/verification-contract.md"
+  },
+  "findings": [
+    {
+      "id": "ARC-1",
+      "statement": "Example only: sample service declares an HTTP entry point.",
+      "confidence": "verified",
+      "sources": [
+        {
+          "path": "sample-api.yaml",
+          "locator": "paths:/orders"
+        }
+      ]
+    },
+    {
+      "id": "DEP-1",
+      "statement": "Example only: external payment behavior not yet confirmed.",
+      "confidence": "unresolved",
+      "sources": []
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "ACT-1",
+      "category": "investigation",
+      "description": "Example only: inspect payment adapter contract before building stub."
+    }
+  ]
+}

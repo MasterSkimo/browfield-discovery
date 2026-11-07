@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1.0",
+  "task_id": "EXAMPLE-42",
+  "request": "Example only: characterize the existing order creation endpoint.",
+  "source_revision": "0123456789abcdef0123456789abcdef01234567",
+  "environment": "Example only: local Docker DB, application process, payment stub; not executed.",
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "expectation": "Create an order and observe the persisted order status.",
+      "implementation_paths": [],
+      "test_ids": [
+        "API-1"
+      ],
+      "status": "not_run",
+      "rationale": "Illustrative example; no test suite is executed by this proposal."
+    }
+  ],
+  "checks": [
+    {
+      "id": "API-1",
+      "kind": "newman",
+      "command": "newman run postman/orders.postman_collection.json",
+      "result": "not_run",
+      "executed_at": null,
+      "assertions": [
+        "Response status and persisted order state match the current observed behavior."
+      ],
+      "artifacts": [],
+      "notes": "Example command only; not executed."
+    }
+  ],
+  "baseline": {
+    "known_failures": [],
+    "regressions": []
+  },
+  "conclusion": {
+    "status": "incomplete",
+    "limitations": [
+      "Illustrative record. Real test implementation and execution are downstream work."
+    ]
+  }
+}

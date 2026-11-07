@@ -1,0 +1,19 @@
+name: Contract checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install schema validator
+        run: python -m pip install -r requirements-dev.txt
+      - name: Validate contracts and package
+        run: python -m unittest discover -s tests -v
