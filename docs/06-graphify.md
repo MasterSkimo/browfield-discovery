@@ -14,3 +14,7 @@ Guardrails:
 - Do not commit Graphify indexes, generated graphs, or credentials into the target repository unless explicitly requested.
 
 No Graphify installation or MCP dependency is introduced by this PR.
+
+## Optional CLI setup
+
+The cross-platform installer can detect or install the official Graphify CLI (`graphifyy`) when explicitly selected. It does not index a repository, run `graphify install`, register hooks or configure MCP. Graphify-generated structural hints remain optional and require file/config validation.

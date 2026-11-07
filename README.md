@@ -29,20 +29,29 @@ The discovery agent gathers the information that makes that mission possible. It
 - On-demand skills under [.opencode/skills](.opencode/skills)
 - Target-project output examples under [templates](templates)
 
-## Try the agent with OpenCode v2
+## Optional bootstrap for Cursor and OpenCode
 
-Run from **this** repository to install global copies, then start OpenCode from the **target** project root:
+A single cross-platform installer offers Basic Memory, MemPalace and Graphify, while detecting installed tools and preserving existing agent configuration.
 
-```sh
-# Copy only the agent and its discovery skills; do not replace unrelated global configuration.
-mkdir -p "$HOME/.config/opencode/agents" "$HOME/.config/opencode/skills"
-cp .opencode/agents/brownfield-discovery.md "$HOME/.config/opencode/agents/"
-cp -R .opencode/skills/brownfield-* "$HOME/.config/opencode/skills/"
+```bash
+# Linux/macOS: show detected tools without changing anything
+python3 scripts/setup.py --check
 
-# In the target repository: ask the agent to perform an information-only discovery.
-opencode
+# Windows PowerShell: same check
+py -3 scripts/setup.py --check
+
+# Interactive selection of tools and clients (all changes require confirmation)
+python3 scripts/setup.py
+
+# Explicit, non-interactive workstation bootstrap
+python3 scripts/setup.py --clients cursor,opencode --tools basic-memory,mempalace,graphify --yes
+
+# Install client agents and shared skills into an existing project without optional tools
+python3 scripts/setup.py --scope project --target /path/to/project --clients cursor,opencode --tools '' --yes
 ```
 
-Select or invoke `brownfield-discovery` in OpenCode. Agent/skills are intentionally model-agnostic and do not enable Graphify or any MCP server by default. Existing global skill names may conflict; review before copying.
+The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, MCP configuration, or Git hook installation occurs automatically. Add `--connect-mcp` only when explicitly choosing MCP integration.
+
+See [optional tooling setup](docs/07-optional-tooling.md).
 
 **Proposal status:** this is an initial contract and agent prompt, not a proven autonomous discovery implementation. It must be exercised on representative brownfield repositories before being promoted to stable.

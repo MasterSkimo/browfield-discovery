@@ -20,8 +20,8 @@ Prepare other autonomous agents to start by building an E2E characterization env
    - `brownfield-e2e-readiness` for UI/API/async behavior, data and preparation gaps;
    - `brownfield-handoff` for compact instructions, evidence contract and next-agent handoff.
 3. Start broad, then investigate only E2E-relevant paths. Do not analyze every class.
-4. Optionally query Graphify if available; verify its hints with code/config and track freshness.
-5. Produce `AGENTS.md` and `.agent-context/` as defined by the output contract. Preserve unrelated existing content. For conflicting rules, document the conflict instead of overwriting it.
+4. Optionally query Graphify if installed; verify its hints with code/config and track freshness. Basic Memory can retain durable findings that do not belong in AGENTS.md. Consult developer-owned MemPalace history only after explicit consent, with project-scoped queries; historical claims are hypotheses until checked against the current revision. Do not mine or import conversations.
+5. Locate the installed templates and schemas in `.agents/brownfield-discovery/` (project or home directory) and produce `AGENTS.md` and `.agent-context/` as defined by the output contract. Preserve unrelated existing content. For conflicting rules, document the conflict instead of overwriting it.
 6. Verify references, check for accidental secrets and unintended changes, and report completeness/unknowns without claiming tests or infrastructure exist.
 
 ## Restrictions
