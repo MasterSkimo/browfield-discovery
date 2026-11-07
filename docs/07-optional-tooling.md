@@ -31,6 +31,8 @@ Cursor receives its custom subagent in .cursor/agents, OpenCode v2 its agent in 
 
 Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files: identical copies are ignored and customized copies become reported conflicts. The target's AGENTS.md is not created or changed during installation.
 
+Cursor user-level skills in ~/.agents/skills are available to local sessions. For Cursor Cloud Agents and remote workers, install project-scoped skills into the repository (or follow Cursor's explicit skill sync mechanism).
+
 ## MCP integration
 
 --connect-mcp explicitly opts in to adding missing server definitions. Supported entrypoints: basic-memory mcp and mempalace-mcp if present on PATH. The script adds missing entries to Cursor's mcpServers JSON and OpenCode v2's mcp.servers JSON; existing server definitions are preserved. JSONC is not rewritten; merge manually if one exists. Graphify stays CLI-only in this bootstrap because using its MCP needs project graph context and separate registration.
