@@ -6,12 +6,12 @@ One entrypoint runs on Linux, macOS and Windows using Python 3.10+ (stdlib only)
 
 - Status only: python3 scripts/setup.py --check (Windows: py -3 scripts\setup.py --check)
 - Interactive: python3 scripts/setup.py
-- Explicit workstation installation: python3 scripts/setup.py --tools basic-memory,mempalace,graphify --clients cursor,opencode --yes
+- Explicit workstation installation: python3 scripts/setup.py --tools basic-memory,mempalace,graphify,context7 --clients cursor,opencode --yes
 - Project-scoped clients (no tools): python3 scripts/setup.py --scope project --target /path/to/repo --tools '' --clients cursor,opencode --yes
 - Preview only: append --dry-run
 - Optional local MCP registration: append --connect-mcp and specify clients and tools
 
-No CLI tools or clients are selected by default. Interactive selection is individual, with a final confirmation defaulting to no. Noninteractive changes require --yes and explicit selections. Existing tools are never upgraded or reinstalled.
+No tools or clients are selected by default. Interactive selection is individual, with a final confirmation defaulting to no. Noninteractive changes require --yes and explicit selections. Existing tools are never upgraded or reinstalled.
 
 ## Official tools
 
@@ -20,8 +20,11 @@ No CLI tools or clients are selected by default. Interactive selection is indivi
 | Basic Memory | basic-memory | basic-memory | Long-lived knowledge not suitable for AGENTS.md |
 | MemPalace | mempalace | mempalace | Developer's past conversations, only with explicit consent |
 | Graphify | graphify | graphifyy | Source graph to guide discovery |
+| Context7 | Existing `context7` MCP server entry | No local package (hosted MCP) | Current library and framework documentation |
 
-The installer requires uv or pipx already installed to add missing packages. It does not download package managers. For Basic Memory, uv uses --prerelease=allow in accordance with its current package requirements.
+Context7 is configured through its remote MCP endpoint `https://mcp.context7.com/mcp` in the selected clients, with no npm or Node.js requirement. Selecting Context7 explicitly authorizes adding that endpoint to selected client configurations; the clients handle OAuth when needed. Existing `context7` entries are never replaced. For the vendor CLI + Skills mode, use `npx ctx7 setup` separately (Node.js 22.13+).
+
+The installer requires uv or pipx already installed to add missing **local Python packages**. It does not download package managers. For Basic Memory, uv uses --prerelease=allow in accordance with its current package requirements.
 
 The script does not initialize repositories, run database migrations, record or mine discussions, scan the current repository with Graphify, or install Graphify hooks/skills. Restart your shell/client when PATH or agent discovery needs refresh.
 
@@ -35,9 +38,11 @@ Cursor user-level skills in ~/.agents/skills are available to local sessions. Fo
 
 ## MCP integration
 
---connect-mcp explicitly opts in to adding missing server definitions. Supported entrypoints: basic-memory mcp and mempalace-mcp if present on PATH. The script adds missing entries to Cursor's mcpServers JSON and OpenCode v2's mcp.servers JSON; existing server definitions are preserved. JSONC is not rewritten; merge manually if one exists. Graphify stays CLI-only in this bootstrap because using its MCP needs project graph context and separate registration.
+--connect-mcp explicitly opts in to adding missing server definitions. Supported local entrypoints: basic-memory mcp and mempalace-mcp if present on PATH. Context7 uses a remote MCP connection and is explicitly registered when selected, even without --connect-mcp. The script adds missing entries to Cursor's mcpServers JSON and OpenCode v2's mcp.servers JSON; existing server definitions are preserved. JSONC is not rewritten; merge manually if one exists. Graphify stays CLI-only in this bootstrap because using its MCP needs project graph context and separate registration.
 
 For a MemPalace installation without mempalace-mcp, run mempalace mcp for version-specific instructions. Neither memory tool mines or syncs history as part of setup.
+
+Context7 queries a hosted documentation service; do not send private source code, customer data, secrets, or internal architecture to its search tools. Consult it for public library documentation and validate details against the application's pinned dependency versions.
 
 ## Privacy and trust
 
@@ -52,6 +57,8 @@ Basic Memory is intended for durable decisions and troubleshooting insights that
 - https://github.com/MemPalace/mempalace
 - https://mempalaceofficial.com/guide/mcp-integration
 - https://github.com/Graphify-Labs/graphify
+- https://github.com/upstash/context7
+- https://context7.com/docs/resources/all-clients
 - https://cursor.com/docs/subagents
 - https://cursor.com/docs/skills
 - https://opencode.ai/docs/agents

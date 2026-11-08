@@ -19,3 +19,5 @@ Graphify may be queried if installed, but relationships inferred from a graph mu
 Record source revision, provenance, confidence (verified/inferred/unresolved), discovered scenarios, external stubbing boundaries, and unknowns. Ensure future work is traceable: request -> acceptance criteria -> implementation -> automated assertions -> observed evidence. Never claim unexecuted tests pass or mark behaviors untestable.
 
 After producing the context package, report any targeted investigations or developer questions left for subsequent agents.
+
+Use Context7 only when up-to-date public documentation for an identified library/version is needed; do not send private source or secrets to hosted documentation services.

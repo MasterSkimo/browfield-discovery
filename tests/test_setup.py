@@ -94,6 +94,63 @@ class SetupTests(unittest.TestCase):
             self.assertFalse((root / "opencode.json").exists())
             self.assertIn("/* manual */", config.read_text(encoding="utf-8"))
 
+
+    def test_context7_remote_mcp_no_local_install(self) -> None:
+        # Selecting Context7 registers its remote MCP directly without Node/npm.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with mock.patch.object(setup, "run", side_effect=AssertionError("No installs")):
+                rc = setup.main([
+                    "--tools", "context7", "--clients", "cursor,opencode",
+                    "--scope", "project", "--target", str(root), "--yes"
+                ])
+            self.assertEqual(rc, 0)
+            cursor = json.loads((root / ".cursor/mcp.json").read_text(encoding="utf-8"))
+            opencode = json.loads((root / "opencode.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                {"url": "https://mcp.context7.com/mcp"}, cursor["mcpServers"]["context7"]
+            )
+            self.assertEqual(
+                {"type": "remote", "url": "https://mcp.context7.com/mcp"},
+                opencode["mcp"]["servers"]["context7"]
+            )
+            self.assertTrue(setup.context7_configured("cursor", "project", root))
+            self.assertTrue(setup.context7_configured("opencode", "project", root))
+            # Re-running must keep existing entries and not install packages.
+            self.assertEqual(0, setup.main([
+                "--tools", "context7", "--clients", "cursor,opencode",
+                "--scope", "project", "--target", str(root), "--yes"
+            ]))
+
+    def test_context7_preserves_existing_server_definition(self) -> None:
+        # Pre-existing MCP entries, including custom headers, are not rewritten.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / ".cursor").mkdir()
+            config = root / ".cursor/mcp.json"
+            existing = {"mcpServers": {
+                "context7": {"url": "https://custom.example/mcp", "headers": {"X-Test": "existing"}},
+                "other": {"command": "existing"}
+            }}
+            config.write_text(json.dumps(existing), encoding="utf-8")
+            setup.connect_mcp("cursor", {"context7"}, "project", root, dry_run=False)
+            self.assertEqual(existing, json.loads(config.read_text(encoding="utf-8")))
+
+    def test_context7_dry_run_and_missing_client(self) -> None:
+        # No MCP config is written during preview and a client is mandatory.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.assertEqual(0, setup.main([
+                "--tools", "context7", "--clients", "cursor",
+                "--scope", "project", "--target", str(root), "--dry-run"
+            ]))
+            self.assertEqual([], list(root.iterdir()))
+            with self.assertRaises(SystemExit):
+                setup.main([
+                    "--tools", "context7", "--clients", "",
+                    "--scope", "project", "--target", str(root), "--yes"
+                ])
+
     def test_explicit_noninteractive_selection(self) -> None:
         # A user can deploy agents without installing any optional package.
         with tempfile.TemporaryDirectory() as tmp:

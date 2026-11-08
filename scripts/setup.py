@@ -17,6 +17,7 @@ TOOLS = {
     "basic-memory": ("basic-memory", "basic-memory"),
     "mempalace": ("mempalace", "mempalace"),
     "graphify": ("graphify", "graphifyy"),
+    "context7": ("ctx7", None),  # Hosted MCP: no local CLI is necessary.
 }
 CLIENTS = ("cursor", "opencode")
 SKILLS = (
@@ -74,6 +75,10 @@ def run(command: list[str], dry_run: bool) -> bool:
 def install_tool(name: str, dry_run: bool) -> bool:
     """Install only missing CLI tools with an existing isolated package manager."""
     binary, package = TOOLS[name]
+    if name == "context7":
+        # Context7 runs as a hosted MCP. Client configuration is the install.
+        print("  context7: hosted MCP; no local package required")
+        return True
     found = executable(binary)
     if found:
         print(f"  {name}: already installed ({found}); no upgrade")
@@ -139,6 +144,26 @@ def deploy_clients(clients: set[str], scope: str, target: Path | None, dry_run: 
         print(f"  {outcome}: {destination}")
 
 
+def context7_configured(client: str, scope: str, target: Path | None) -> bool:
+    """Detect an existing Context7 MCP without opening authentication sessions."""
+    path = config_location(client, scope, target)
+    if not path.is_file():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return False
+        if client == "cursor":
+            servers = data.get("mcpServers", {})
+        else:
+            mcp = data.get("mcp", {})
+            servers = mcp.get("servers", {}) if isinstance(mcp, dict) else {}
+        # A server named context7 is considered user-owned even when configured differently.
+        return isinstance(servers, dict) and "context7" in servers
+    except (OSError, ValueError):
+        return False
+
+
 def mcp_command(name: str) -> list[str] | None:
     """Resolve locally available MCP entrypoints; no automatic downloads at runtime."""
     if name == "basic-memory" and executable("basic-memory"):
@@ -186,12 +211,21 @@ def connect_mcp(client: str, names: set[str], scope: str, target: Path | None, d
     # Respect ownership and all existing server names; never upgrade in place.
     added: dict[str, object] = {}
     for name in sorted(names):
+        if name in servers:
+            print(f"  {client} MCP {name}: already configured; unchanged")
+            continue
+        if name == "context7":
+            # Official remote endpoint; OAuth is handled by Cursor/OpenCode.
+            # Never put API tokens into project or home configuration.
+            added[name] = (
+                {"url": "https://mcp.context7.com/mcp"}
+                if client == "cursor"
+                else {"type": "remote", "url": "https://mcp.context7.com/mcp"}
+            )
+            continue
         cmd = mcp_command(name)
         if cmd is None:
             print(f"  {name}: no verified MCP executable found; keep CLI-only or follow vendor setup.")
-            continue
-        if name in servers:
-            print(f"  {client} MCP {name}: already configured; unchanged")
             continue
         added[name] = (
             {"command": cmd[0], "args": cmd[1:]}
@@ -222,7 +256,7 @@ def main(argv: list[str] | None = None) -> int:
     """Apply user-selected package, client and optional MCP operations."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="Display tool status without changing files")
-    parser.add_argument("--tools", help="Comma-separated optional packages: basic-memory,mempalace,graphify")
+    parser.add_argument("--tools", help="Comma-separated optional tools: basic-memory,mempalace,graphify,context7")
     parser.add_argument("--clients", help="Comma-separated clients: cursor,opencode")
     parser.add_argument("--scope", choices=("global", "project"), default="global")
     parser.add_argument("--target", type=Path, help="Target repository root (required for project scope)")
@@ -232,7 +266,15 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     print("Detected tools:")
     for name, (binary, _) in TOOLS.items():
-        print(f"  {name}: {executable(binary) or 'not detected'}")
+        if name == "context7":
+            scopes = []
+            for client in CLIENTS:
+                if context7_configured(client, args.scope, args.target):
+                    scopes.append(client)
+            print(f"  context7: MCP configured for {', '.join(scopes)}" if scopes
+                  else "  context7: MCP not detected (hosted, no local CLI required)")
+        else:
+            print(f"  {name}: {executable(binary) or 'not detected'}")
     if args.check:
         return 0
     try:
@@ -248,8 +290,8 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
         if args.scope == "project":
             deployment_paths(args.scope, args.target)  # Validate before package installation.
-        if args.connect_mcp and not clients:
-            raise ValueError("--connect-mcp requires --clients")
+        if (args.connect_mcp or "context7" in tools) and not clients:
+            raise ValueError("MCP registration requires --clients cursor,opencode or both")
     except (RuntimeError, ValueError) as exc:
         parser.error(str(exc))
     successful = set()
@@ -257,11 +299,16 @@ def main(argv: list[str] | None = None) -> int:
         if install_tool(name, args.dry_run):
             successful.add(name)
     deploy_clients(clients, args.scope, args.target, args.dry_run)
-    if args.connect_mcp:
-        for client in sorted(clients):
-            connect_mcp(client, successful, args.scope, args.target, args.dry_run)
-    elif successful:
-        print("\nMCP connections were not changed; use --connect-mcp to opt in.")
+    # Context7 selection explicitly authorizes remote MCP registration.
+    # Local memory MCP integrations still require --connect-mcp.
+    mcp_names = (successful if args.connect_mcp else successful.intersection({"context7"}))
+    for client in sorted(clients):
+        if mcp_names:
+            connect_mcp(client, mcp_names, args.scope, args.target, args.dry_run)
+    if successful.difference({"context7"}) and not args.connect_mcp:
+        print("\nLocal MCP connections were not changed; use --connect-mcp to opt in.")
+    if "context7" in successful:
+        print("Context7: remote MCP registered where missing; authenticate in the client if prompted.")
     if "mempalace" in successful:
         print("MemPalace: existing memories were not imported, mined or modified.")
     if "graphify" in successful:

@@ -31,7 +31,7 @@ The discovery agent gathers the information that makes that mission possible. It
 
 ## Optional bootstrap for Cursor and OpenCode
 
-A single cross-platform installer offers Basic Memory, MemPalace and Graphify, while detecting installed tools and preserving existing agent configuration.
+A single cross-platform installer offers Basic Memory, MemPalace, Graphify and Context7, while detecting installed tools and preserving existing agent configuration.
 
 ```bash
 # Linux/macOS: show detected tools without changing anything
@@ -44,13 +44,13 @@ py -3 scripts/setup.py --check
 python3 scripts/setup.py
 
 # Explicit, non-interactive workstation bootstrap
-python3 scripts/setup.py --clients cursor,opencode --tools basic-memory,mempalace,graphify --yes
+python3 scripts/setup.py --clients cursor,opencode --tools basic-memory,mempalace,graphify,context7 --yes
 
 # Install client agents and shared skills into an existing project without optional tools
 python3 scripts/setup.py --scope project --target /path/to/project --clients cursor,opencode --tools '' --yes
 ```
 
-The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, MCP configuration, or Git hook installation occurs automatically. Add `--connect-mcp` only when explicitly choosing MCP integration.
+The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, or Git hook installation occurs automatically. Selecting Context7 authorizes registering its hosted MCP endpoint for the selected clients, preserving existing entries. Local memory MCP connections still require `--connect-mcp`.
 
 See [optional tooling setup](docs/07-optional-tooling.md).
 
