@@ -264,6 +264,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--yes", action="store_true", help="Confirm explicitly selected operations")
     parser.add_argument("--dry-run", action="store_true", help="Preview without changing files or installing")
     args = parser.parse_args(argv)
+    if args.scope == "project" and args.target is None:
+        parser.error("--target PATH is required with --scope project")
     print("Detected tools:")
     for name, (binary, _) in TOOLS.items():
         if name == "context7":
@@ -281,7 +283,7 @@ def main(argv: list[str] | None = None) -> int:
         tools = parse_csv(args.tools, TOOLS) 
         clients = parse_csv(args.clients, CLIENTS)
         if tools is None:
-            tools = choose_many("Optional CLI tools (nothing is installed by default):", TOOLS)
+            tools = choose_many("Optional tools (nothing is installed by default):", TOOLS)
         if clients is None:
             clients = choose_many("Install discovery agent for:", CLIENTS)
         if not args.yes and not args.dry_run:

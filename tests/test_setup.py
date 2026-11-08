@@ -136,6 +136,12 @@ class SetupTests(unittest.TestCase):
             setup.connect_mcp("cursor", {"context7"}, "project", root, dry_run=False)
             self.assertEqual(existing, json.loads(config.read_text(encoding="utf-8")))
 
+
+    def test_project_status_requires_target(self) -> None:
+        # Invalid project scope must fail with a usage error rather than assert.
+        with self.assertRaises(SystemExit):
+            setup.main(["--check", "--scope", "project"])
+
     def test_context7_dry_run_and_missing_client(self) -> None:
         # No MCP config is written during preview and a client is mandatory.
         with tempfile.TemporaryDirectory() as tmp:
