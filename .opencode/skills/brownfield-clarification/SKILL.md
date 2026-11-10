@@ -5,7 +5,7 @@ description: Interview the developer after discovery about evidence-backed unkno
 
 # D7 — Clarification loop
 
-After D0–D6 and the first quality check, or via /brownfield-clarify, read docs/11-interactive-clarification.md from the installed package.
+After the first D0–D6 investigation and **attempted** quality check (even when D6 is blocked by a genuine user-answerable unknown), or via /brownfield-clarify, read docs/11-interactive-clarification.md from the installed package.
 
 1. Read manifest, progress, unknowns and existing clarifications; never restart a whole-codebase exploration when resuming.
 2. Complete autonomous evidence investigation first. List only developer-answerable questions not settled by code, tests, config, CI or evidence-based inference.

@@ -13,7 +13,7 @@ Discovery produces a usable Docker foundation, not just plans. The downstream E2
 | D6 — Handoff and quality gate | Generate operational AGENTS.md, sources, progress and checks | Docker scaffold and metadata validated; existing app/dev config unchanged |
 | D7 — Developer clarification | **Start an interactive conversation** about evidence-backed remaining unknowns; update project outputs from answers | Questions resolved, explicitly deferred/declined or no questions remain; results recorded |
 
-Maintain .agent-context/discovery-progress.json with evidence and blockers for every phase. D7 starts **after D6** with a real user-facing question when unknowns remain. Persist the question in .agent-context/clarifications.md and mark D7 awaiting_user until a reply or an explicit deferral. Proceed sequentially, reopening an earlier phase if an answer changes it. A phase cannot be done merely because a Markdown file exists.
+Maintain .agent-context/discovery-progress.json with evidence and blockers for every phase. D7 starts **after the first D6 validation attempt**, even if D6 cannot pass because a genuinely developer-answerable unknown remains. Fix agent-solvable validation defects first; do not force a blocked D6 gate to pass merely to ask a question. D7 then opens a real user-facing question when relevant unknowns remain. Persist the question in .agent-context/clarifications.md and mark D7 awaiting_user until a reply or an explicit deferral. Proceed sequentially, reopening an earlier phase if an answer changes it. A phase cannot be done merely because a Markdown file exists.
 
 ## D2 rules
 

@@ -1,6 +1,6 @@
 # D7 — Interactive developer clarification
 
-D7 begins **after D0–D6**: initial discovery, Docker foundation, AGENTS.md and first structural validation are complete. It is a real dialogue with the user who launched discovery, not only a list of unresolved facts.
+D7 begins **after attempting D0–D6**, producing the initial Docker/AGENTS handoff and running the first structural validation. D6 may still be **blocked by a genuine developer-answerable unknown**; this must not prevent the D7 interview. Do not use a human question to bypass defects the agent can repair itself. It is a real dialogue with the user who launched discovery, not only a list of unresolved facts.
 
 ## Starting the conversation
 
@@ -34,3 +34,7 @@ Never store raw chats, developer identity, credentials, client/customer informat
 ## Example phrasing (illustrative only)
 
 UNK-3 — Identity: I found an OIDC issuer setting in config and middleware requiring JWT, but no test IdP configuration. My hypothesis is that the E2E environment must simulate the external issuer. Can the app accept locally issued tokens, or is a specific external login flow mandatory?
+
+## Blocked D6 exception
+
+If a critical human decision is the reason D6 cannot pass, the agent may set D6 to `blocked` with evidence and D7 to `awaiting_user`, then ask the user. If the developer supplies the missing decision, revisit D2/D5/D6, rerun the gate, and only then close D7 and assess final readiness. If they cannot answer, mark D7 `done` with deferred questions and retain `needs_investigation` due to D6. Do not claim discovery ready or stop without having asked.

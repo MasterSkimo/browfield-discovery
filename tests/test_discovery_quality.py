@@ -314,6 +314,43 @@ class GateTests(unittest.TestCase):
             path.write_text(path.read_text(encoding="utf-8") + "\nUNK-9: deferred by developer; verify issuer externally.\n", encoding="utf-8")
             self.assertEqual([], gate.collect_problems(root))
 
+    def test_clarification_can_follow_blocked_handoff(self) -> None:
+        # A genuinely human-dependent D6 blocker must not prevent the D7 interview.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = make_fixture(root)
+            manifest["status"] = "awaiting_user_clarification"
+            manifest["findings"].append({
+                "id": "UNK-11", "statement": "Unknown external OAuth requirement",
+                "confidence": "unresolved", "sources": []
+            })
+            manifest["next_actions"].append({
+                "id": "ACT-11", "category": "developer-question",
+                "description": "Confirm test OAuth provider",
+                "finding_ids": ["UNK-11"], "searched_sources": ["pom.xml"],
+                "hypothesis": "The identity provider can be simulated in E2E",
+                "why_unresolved": "The identity provider contract is external to this repository."
+            })
+            (root / ".agent-context/manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            progress_path = root / OUTPUTS["discovery_progress"]
+            progress = json.loads(progress_path.read_text(encoding="utf-8"))
+            progress["phases"][6]["status"] = "blocked"
+            progress["phases"][6]["blockers"] = ["OAuth provider configuration needs a developer decision"]
+            progress["phases"][7]["status"] = "awaiting_user"
+            progress_path.write_text(json.dumps(progress), encoding="utf-8")
+            (root / OUTPUTS["clarifications"]).write_text(
+                "# Developer clarifications\n## Conversation status\nawaiting_user\n"
+                "## Questions and answers\nUNK-11: Can a local test identity provider be used?\n",
+                encoding="utf-8"
+            )
+            self.assertEqual([], gate.collect_problems(root))
+            # Deferring is allowed, but critical readiness is still blocked by D6.
+            progress["phases"][7]["status"] = "done"
+            progress_path.write_text(json.dumps(progress), encoding="utf-8")
+            manifest["status"] = "needs_investigation"
+            (root / ".agent-context/manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            self.assertEqual([], gate.collect_problems(root))
+
     def test_unreplaced_template_fails(self) -> None:
         # A generated guide cannot retain authoring placeholders.
         with tempfile.TemporaryDirectory() as temp:

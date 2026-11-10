@@ -233,7 +233,7 @@ def collect_problems(project: Path) -> list[str]:
                     if status not in ("pending", "in_progress", "done", "blocked", "awaiting_user"):
                         issues.append(f"{pid}: invalid phase status")
                     if status == "done":
-                        if seen_incomplete:
+                        if seen_incomplete and pid != "D7":
                             issues.append(f"{pid}: completed after an incomplete previous phase")
                         if not isinstance(evidence, list) or not evidence:
                             issues.append(f"{pid}: done without source evidence")
