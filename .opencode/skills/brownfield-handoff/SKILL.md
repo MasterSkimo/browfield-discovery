@@ -25,3 +25,7 @@ Preserve `AGENTS.md` and module-specific rules already present. Add non-conflict
 ## Workflow handoff
 
 Before completion, require D0–D6 progression with evidence in `.agent-context/discovery-progress.json`. Verify **actual** `.e2e/compose.yaml`, `.e2e/.env.e2e.example`, Dockerfiles/profiles where needed and `.e2e/.gitignore` exist; `.agent-context/environment-blueprint.md` must describe their sources, all app/DB/broker services, external stub wiring, profile/env settings, config-check result, fixture/reset tasks and gaps. Include the runtime strategy directly in AGENTS.md, while linking to the detailed blueprint. Never claim provisioning or build success that did not occur.
+
+## Post-handoff developer interview
+
+D6 is not the end of the conversation. Always invoke brownfield-clarification as D7. If any investigated user-answerable unknown remains, **ask one specific question directly to the user**, save `awaiting_user` and wait for their response. On answers, update findings and affected Docker/AGENTS/context, revalidate and continue. Do not close the session with a list of unknowns; a separate `/brownfield-clarify` command resumes a pending interview.

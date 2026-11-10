@@ -20,9 +20,10 @@ TOOLS = {
     "context7": ("ctx7", None),  # Hosted MCP: no local CLI is necessary.
 }
 CLIENTS = ("cursor", "opencode")
-COMMANDS = ("brownfield-discover",)
+COMMANDS = ("brownfield-discover", "brownfield-clarify")
 SKILLS = (
     "brownfield-inference",
+    "brownfield-clarification",
     "brownfield-repository",
     "brownfield-boundaries",
     "brownfield-runtime-topology",

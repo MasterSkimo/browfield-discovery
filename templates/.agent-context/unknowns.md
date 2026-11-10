@@ -13,3 +13,7 @@ List existing AGENTS.md rules that could not be merged, with paths and proposed 
 
 ## Source freshness
 Record stale/replaced graph indexes, branch changes or configurations that may need revalidation.
+
+## D7 interactive resolution
+
+Only escalate unknowns that survived the evidence ladder. Prioritize those a developer can answer, link them by ID to `.agent-context/clarifications.md` and ask one question at a time after D6. Preserve skipped or unanswered items with follow-up actions; a user statement must be verified where possible before modifying source-backed conclusions.

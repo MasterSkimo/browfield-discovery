@@ -43,7 +43,8 @@
     "status": {
       "enum": [
         "ready_for_e2e_setup",
-        "needs_investigation"
+        "needs_investigation",
+        "awaiting_user_clarification"
       ]
     },
     "outputs": {
@@ -61,7 +62,8 @@
         "discovery_progress",
         "compose_file",
         "env_example",
-        "local_ignore"
+        "local_ignore",
+        "clarifications"
       ],
       "properties": {
         "agent_instructions": {
@@ -109,6 +111,10 @@
           "minLength": 1
         },
         "local_ignore": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clarifications": {
           "type": "string",
           "minLength": 1
         }

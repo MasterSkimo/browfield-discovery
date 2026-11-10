@@ -11,8 +11,9 @@ Discovery produces a usable Docker foundation, not just plans. The downstream E2
 | D4 — Data and integrations | Map fixtures/migrations/reset, auth and external contracts | Concrete work items for the E2E agent |
 | D5 — Independent inference | Revisit all unknowns and update Docker files using corroborated source evidence | Only justified unknowns remain and D2 stays consistent |
 | D6 — Handoff and quality gate | Generate operational AGENTS.md, sources, progress and checks | Docker scaffold and metadata validated; existing app/dev config unchanged |
+| D7 — Developer clarification | **Start an interactive conversation** about evidence-backed remaining unknowns; update project outputs from answers | Questions resolved, explicitly deferred/declined or no questions remain; results recorded |
 
-Maintain .agent-context/discovery-progress.json with evidence and blockers for every phase. Proceed sequentially, reopening a previous phase if findings invalidate it. A phase cannot be done merely because a Markdown file exists.
+Maintain .agent-context/discovery-progress.json with evidence and blockers for every phase. D7 starts **after D6** with a real user-facing question when unknowns remain. Persist the question in .agent-context/clarifications.md and mark D7 awaiting_user until a reply or an explicit deferral. Proceed sequentially, reopening an earlier phase if an answer changes it. A phase cannot be done merely because a Markdown file exists.
 
 ## D2 rules
 
@@ -28,10 +29,14 @@ Maintain .agent-context/discovery-progress.json with evidence and blockers for e
 
 ## Readiness
 
-ready_for_e2e_setup requires D0–D6 done with evidence and a concrete Docker foundation that passes the structural gate. If a Compose config check was possible and failed, the failure blocks readiness. If Docker was unavailable, record not_run and the reason; the E2E agent must perform runtime checks later.
+ready_for_e2e_setup requires D0–D7 done with evidence and a concrete Docker foundation that passes the structural gate. If a Compose config check was possible and failed, the failure blocks readiness. If Docker was unavailable, record not_run and the reason; the E2E agent must perform runtime checks later.
 
 needs_investigation means a required component, scaffold or handoff rule could not be established without further investigation.
 
 ## Review decisions
 
 The present boundary is: discovery creates Docker scaffolding and isolated E2E configurations; the E2E agent completes stubs, fixtures, Playwright/Newman and runtime verification. Build/start/health validation can be expanded later.
+
+## Post-discovery conversation (D7)
+
+Immediately after generating the initial Docker/AGENTS handoff and validating D6, call the **brownfield-clarification** skill. Rank justified unknowns and ask the user **one specific question** in the chat, with source evidence, strongest hypothesis and why their answer matters. Do not sign off with only a report or a list of unknowns. User replies can update Docker files, instructions and findings; recheck affected phases. If no reply, persist `awaiting_user` and stop with that question visible. If no useful developer-answerable unknowns exist, record that conclusion and finish D7. A deferred unknown is not resolved. Resume later with `/brownfield-clarify`. Details: [interactive clarification](11-interactive-clarification.md).

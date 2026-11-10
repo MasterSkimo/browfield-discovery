@@ -24,6 +24,7 @@ OUTPUTS = {
     "verification_contract": ".agent-context/verification-contract.md",
     "environment_blueprint": ".agent-context/environment-blueprint.md",
     "discovery_progress": ".agent-context/discovery-progress.json",
+    "clarifications": ".agent-context/clarifications.md",
     "compose_file": ".e2e/compose.yaml",
     "env_example": ".e2e/.env.e2e.example",
     "local_ignore": ".e2e/.gitignore",
@@ -51,7 +52,7 @@ def make_fixture(root: Path) -> dict:
     text = "# AGENTS.md — Sample API\n\n" + "\n\n".join(f"## {title}\n{body}" for title, body in sections.items())
     (root / "AGENTS.md").write_text(text, encoding="utf-8")
     for name, path in OUTPUTS.items():
-        if name in ("agent_instructions", "discovery_progress", "compose_file", "env_example", "local_ignore"):
+        if name in ("agent_instructions", "discovery_progress", "compose_file", "env_example", "local_ignore", "clarifications"):
             continue
         f = root / path
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -80,14 +81,22 @@ def make_fixture(root: Path) -> dict:
     )
     (root / ".e2e/.env.e2e.example").write_text("APP_PROFILE=e2e\n", encoding="utf-8")
     (root / ".e2e/.gitignore").write_text(".env.e2e.local\n*.secret\n", encoding="utf-8")
-    # A complete readiness claim requires seven sequential phase gates with file evidence.
+    # The developer interview is a required output even when no questions exist.
+    (root / OUTPUTS["clarifications"]).write_text(
+        "# Developer clarifications\n"
+        "## Conversation status\nNo developer clarification required.\n"
+        "## Questions and answers\nNo questions after investigation.\n",
+        encoding="utf-8",
+    )
+    # A ready handoff includes the eighth, interactive stage with evidence.
     progress = {
         "schema_version": "0.1.0",
         "revision": "0123456789abcdef",
         "phases": [
-            {"id": f"D{i}", "status": "done", "evidence": ["pom.xml"],
+            {"id": f"D{i}", "status": "done",
+             "evidence": [OUTPUTS["clarifications"]] if i == 7 else ["pom.xml"],
              "blockers": [], "notes": "Example fixture evidence only"}
-            for i in range(7)
+            for i in range(8)
         ],
     }
     (root / OUTPUTS["discovery_progress"]).write_text(json.dumps(progress), encoding="utf-8")
@@ -147,6 +156,12 @@ class GateTests(unittest.TestCase):
                 "why_unresolved": "The external identity provider contract is not present."
             }]
             out.write_text(json.dumps(manifest), encoding="utf-8")
+            # D7 is closed only after the unknown is registered as deferred or addressed.
+            ledger = root / OUTPUTS["clarifications"]
+            ledger.write_text(
+                ledger.read_text(encoding="utf-8") + "\nUNK-1: deferred, contract to verify.\n",
+                encoding="utf-8",
+            )
             self.assertEqual([], gate.collect_problems(root))
 
     def test_unproven_inference_and_escape_fail(self) -> None:
@@ -163,7 +178,7 @@ class GateTests(unittest.TestCase):
 
 
     def test_incomplete_workflow_blocks_ready(self) -> None:
-        # Discovery cannot claim readiness until all seven gates are finished.
+        # Discovery cannot claim readiness until all eight gates are finished.
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             make_fixture(root)
@@ -173,7 +188,7 @@ class GateTests(unittest.TestCase):
             progress["phases"][2]["evidence"] = []
             path.write_text(json.dumps(progress), encoding="utf-8")
             errors = gate.collect_problems(root)
-            self.assertTrue(any("all D0-D6 gates" in x for x in errors))
+            self.assertTrue(any("all D0-D7 gates" in x for x in errors))
             self.assertTrue(any("completed after an incomplete" in x for x in errors))
 
     def test_phase_evidence_is_required(self) -> None:
@@ -244,6 +259,60 @@ class GateTests(unittest.TestCase):
             if gate.yaml is None:
                 self.skipTest("PyYAML is not installed")
             self.assertTrue(any("Dockerfile is missing" in e for e in gate.collect_problems(root)))
+
+    def test_question_is_saved_while_waiting_for_user(self) -> None:
+        # Awaiting a human response is a valid persistent discovery state.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = make_fixture(root)
+            manifest["status"] = "awaiting_user_clarification"
+            manifest["findings"].append({
+                "id": "UNK-7", "statement": "External identity integration",
+                "confidence": "unresolved", "sources": []
+            })
+            manifest["next_actions"].append({
+                "id": "ACT-7", "category": "developer-question", "description": "Confirm test identity",
+                "finding_ids": ["UNK-7"], "searched_sources": ["pom.xml"],
+                "hypothesis": "Identity is controlled by an external test provider",
+                "why_unresolved": "The external IdP contract is not included in this checkout."
+            })
+            (root / ".agent-context/manifest.json").write_text(
+                json.dumps(manifest), encoding="utf-8"
+            )
+            progress_file = root / OUTPUTS["discovery_progress"]
+            progress = json.loads(progress_file.read_text(encoding="utf-8"))
+            progress["phases"][-1]["status"] = "awaiting_user"
+            progress_file.write_text(json.dumps(progress), encoding="utf-8")
+            (root / OUTPUTS["clarifications"]).write_text(
+                "# Developer clarifications\n## Conversation status\nStatus: awaiting_user\n"
+                "## Questions and answers\nUNK-7: Does E2E require an external IdP?\n",
+                encoding="utf-8",
+            )
+            self.assertEqual([], gate.collect_problems(root))
+            manifest["status"] = "ready_for_e2e_setup"
+            (root / ".agent-context/manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            self.assertTrue(any("requires all D0-D7" in e for e in gate.collect_problems(root)))
+
+    def test_unresolved_unknown_needs_interview_record(self) -> None:
+        # A developer-answerable unknown cannot vanish from a completed handoff.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = make_fixture(root)
+            manifest["findings"].append({
+                "id": "UNK-9", "statement": "Issuer contract unclear",
+                "confidence": "unresolved", "sources": []
+            })
+            manifest["next_actions"].append({
+                "id": "ACT-9", "category": "developer-question", "description": "Confirm issuer contract",
+                "finding_ids": ["UNK-9"], "searched_sources": ["pom.xml"],
+                "hypothesis": "Local test issuer may be supported by the service",
+                "why_unresolved": "Issuer details are outside the checked-out repository."
+            })
+            (root / ".agent-context/manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            self.assertTrue(any("UNK-9 is missing" in e for e in gate.collect_problems(root)))
+            path = root / OUTPUTS["clarifications"]
+            path.write_text(path.read_text(encoding="utf-8") + "\nUNK-9: deferred by developer; verify issuer externally.\n", encoding="utf-8")
+            self.assertEqual([], gate.collect_problems(root))
 
     def test_unreplaced_template_fails(self) -> None:
         # A generated guide cannot retain authoring placeholders.

@@ -25,7 +25,7 @@ SECTIONS = (
 OUTPUTS = (
     "agent_instructions", "architecture", "execution", "dependencies",
     "e2e_inventory", "unknowns", "verification_contract",
-    "environment_blueprint", "discovery_progress",
+    "environment_blueprint", "discovery_progress", "clarifications",
     "compose_file", "env_example", "local_ignore",
 )
 PLACEHOLDER = re.compile(r"\{\{[^}]+\}\}|<PROJECT NAME>|<ADD ONLY|<SOURCE-BACKED|\bPROJECT_NAME\b|\bAPP_MODULES_WITH_PATHS\b|\bEVIDENCE_AND_ACTIONS\b|\bREVISION_REPLACE_WITH_REAL_SHA\b", re.IGNORECASE)
@@ -208,9 +208,9 @@ def collect_problems(project: Path) -> list[str]:
             if progress.get("revision") != revision:
                 issues.append("discovery progress revision does not match analyzed manifest revision")
             phases = progress.get("phases")
-            required_ids = [f"D{i}" for i in range(7)]
+            required_ids = [f"D{i}" for i in range(8)]
             if not isinstance(phases, list) or [x.get("id") if isinstance(x, dict) else None for x in phases] != required_ids:
-                issues.append("discovery progress phases must be ordered D0-D6")
+                issues.append("discovery progress phases must be ordered D0-D7")
             else:
                 seen_incomplete = False
                 for phase in phases:
@@ -218,7 +218,19 @@ def collect_problems(project: Path) -> list[str]:
                     status = phase.get("status")
                     evidence = phase.get("evidence")
                     blockers = phase.get("blockers")
-                    if status not in ("pending", "in_progress", "done", "blocked"):
+                    if status not in ("pending", "in_progress", "done", "blocked", "awaiting_user"):
+                        issues.append(f"{pid}: invalid phase status")
+                    if status == "awaiting_user" and pid != "D7":
+                        issues.append(f"{pid}: only D7 may await user")
+                    if status == "awaiting_user" and (
+                        not isinstance(evidence, list) or " .agent-context/clarifications.md".strip() not in evidence
+                    ):
+                        issues.append("D7 awaiting_user must cite its clarification ledger")
+                    if status == "done" and pid == "D7" and (
+                        not isinstance(evidence, list) or ".agent-context/clarifications.md" not in evidence
+                    ):
+                        issues.append("D7 completed without clarification ledger evidence")
+                    if status not in ("pending", "in_progress", "done", "blocked", "awaiting_user"):
                         issues.append(f"{pid}: invalid phase status")
                     if status == "done":
                         if seen_incomplete:
@@ -237,10 +249,32 @@ def collect_problems(project: Path) -> list[str]:
                 if manifest.get("status") == "ready_for_e2e_setup" and any(
                     phase.get("status") != "done" for phase in phases
                 ):
-                    issues.append("ready_for_e2e_setup requires all D0-D6 gates complete")
+                    issues.append("ready_for_e2e_setup requires all D0-D7 gates complete")
+    # A pending question is a persisted interactive state, not completed handoff.
+    clarification_file_name = outputs.get("clarifications")
+    clarification_file = under_project(project, clarification_file_name) if isinstance(clarification_file_name, str) else None
+    clarification_text = ""
+    if clarification_file and clarification_file.is_file():
+        clarification_text = clarification_file.read_text(encoding="utf-8")
+        if "Questions and answers" not in clarification_text or "Conversation status" not in clarification_text:
+            issues.append("clarification ledger lacks conversation status or question register")
+    phase7 = None
+    if isinstance(progress_file, Path) and progress_file.is_file():
+        try:
+            phase_data = json.loads(progress_file.read_text(encoding="utf-8")).get("phases", [])
+            phase7 = next((x for x in phase_data if isinstance(x, dict) and x.get("id") == "D7"), None)
+        except (OSError, UnicodeError, ValueError, AttributeError):
+            pass
+    if manifest.get("status") == "awaiting_user_clarification":
+        if not phase7 or phase7.get("status") != "awaiting_user":
+            issues.append("awaiting_user_clarification requires D7 awaiting_user")
+        if "awaiting_user" not in clarification_text.lower():
+            issues.append("awaiting_user state is not recorded in clarification ledger")
+    if phase7 and phase7.get("status") == "awaiting_user" and manifest.get("status") != "awaiting_user_clarification":
+        issues.append("D7 awaiting_user requires manifest status awaiting_user_clarification")
     if outputs.get("agent_instructions") != "AGENTS.md":
         issues.append("agent_instructions must point to root AGENTS.md")
-    if manifest.get("status") not in ("ready_for_e2e_setup", "needs_investigation"):
+    if manifest.get("status") not in ("ready_for_e2e_setup", "needs_investigation", "awaiting_user_clarification"):
         issues.append("unsupported manifest status")
 
     # Static inference is useful only when the source and reasoning are explicit.
@@ -291,6 +325,18 @@ def collect_problems(project: Path) -> list[str]:
                 issues.append(f"{action.get('id')}: no bounded hypothesis")
     for fid in sorted(unresolved - referenced):
         issues.append(f"unresolved {fid} has no linked investigation action")
+    # Every question that survived investigation must be represented in the user interview.
+    if phase7 and phase7.get("status") in ("done", "awaiting_user"):
+        for fid in sorted(unresolved):
+            if fid not in clarification_text:
+                issues.append(f"unresolved {fid} is missing from developer clarification ledger")
+    if phase7 and phase7.get("status") == "awaiting_user" and not unresolved:
+        has_developer_question = any(
+            isinstance(action, dict) and action.get("category") == "developer-question"
+            for action in actions
+        )
+        if not has_developer_question:
+            issues.append("D7 awaiting_user without an investigated developer question")
     return issues
 
 

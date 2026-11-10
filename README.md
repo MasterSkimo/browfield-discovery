@@ -27,6 +27,7 @@ The discovery agent gathers the information **and creates the Docker starting po
 - [Optional Graphify integration](docs/06-graphify.md)
 - [Investigation and inference protocol](docs/08-investigation-protocol.md)
 - [Proposed phased discovery workflow](docs/09-discovery-workflow.md)
+- [Interactive developer clarification](docs/11-interactive-clarification.md)
 - [Compose-first E2E runtime contract](docs/10-compose-first-handoff.md)
 - OpenCode v2 agent: [.opencode/agents/brownfield-discovery.md](.opencode/agents/brownfield-discovery.md)
 - On-demand skills under [.opencode/skills](.opencode/skills)
@@ -44,7 +45,7 @@ After installing the agent and commands in the **target** project or globally:
 /brownfield-discover
 ~~~
 
-The command follows phases D0–D6 from [the workflow](docs/09-discovery-workflow.md), records progress, **creates .e2e/compose.yaml, Dockerfiles and E2E profiles/env example when required**, documents their status, and invokes source-backed inference. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
+The command follows phases D0–D7 from [the workflow](docs/09-discovery-workflow.md), records progress, **creates .e2e/compose.yaml, Dockerfiles and E2E profiles/env example when required**, documents their status, and invokes source-backed inference. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
 
 For noninteractive OpenCode runs from the target repository root:
 
@@ -57,6 +58,8 @@ In T3, commands must **start** the message. If the provider does not display the
 ~~~sh
 python3 .agents/brownfield-discovery/scripts/validate_discovery.py --project .
 ~~~
+
+After D6, if justified unknowns remain, the agent **asks the user the first clarifying question in the chat** (with source evidence and hypothesis) and persists `awaiting_user`. Reply in the same conversation, or resume in T3/OpenCode or Cursor using `/brownfield-clarify`. An answer is cross-checked against the repo before changing the Docker foundation and `AGENTS.md`. If no meaningful developer questions exist, D7 completes without an interview.
 
 Use the globally installed copy from ~/.agents/brownfield-discovery/scripts when working with global agent configuration.
 

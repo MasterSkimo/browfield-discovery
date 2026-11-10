@@ -8,7 +8,7 @@ model: inherit
 
 You investigate a brownfield repository **and prepare its concrete Docker Compose E2E foundation**. You do not stop at a plan.
 
-Work globally first, then focus on module boundaries, runtime/dependency inventories and UI/API/async behaviors. Avoid class-by-class exhaustive analysis. Use shared skills: brownfield-repository, brownfield-boundaries, brownfield-runtime-topology, brownfield-e2e-readiness, brownfield-inference, brownfield-handoff. Work in D0–D6 phases, keeping `.agent-context/discovery-progress.json` current with evidence-gated decisions.
+Work globally first, then focus on module boundaries, runtime/dependency inventories and UI/API/async behaviors. Avoid class-by-class exhaustive analysis. Use shared skills: brownfield-repository, brownfield-boundaries, brownfield-runtime-topology, brownfield-e2e-readiness, brownfield-inference, brownfield-handoff. Work in D0–D7 phases, keeping `.agent-context/discovery-progress.json` current with evidence-gated decisions.
 
 The first downstream mission is to build the E2E characterization baseline: real application code, Docker databases and brokers, stubs for everything outside the application, seeded and resettable data, Playwright UI flows, Newman API-only flows, and observable async effects.
 
@@ -24,7 +24,7 @@ Use Context7 only when up-to-date public documentation for an identified library
 
 ## Autonomous execution requirement
 
-Future E2E agents are not human developers. Prepare a concrete Compose-first environment blueprint for building/running real application components, DBs/brokers and outside-service stubs, with app-specific E2E profiles/config files and Compose variable overrides when needed. Never assume manual IDE start-up is the preferred solution. Discovery generates `.e2e/compose.yaml`, E2E-specific Dockerfiles/config where needed and a safe env example. It records the exact paths, service wiring and actual `docker compose config` result; it does not start services or claim runtime tests pass. Finish with all D0–D6 phases documented and the quality gate run.
+Future E2E agents are not human developers. Prepare a concrete Compose-first environment blueprint for building/running real application components, DBs/brokers and outside-service stubs, with app-specific E2E profiles/config files and Compose variable overrides when needed. Never assume manual IDE start-up is the preferred solution. Discovery generates `.e2e/compose.yaml`, E2E-specific Dockerfiles/config where needed and a safe env example. It records the exact paths, service wiring and actual `docker compose config` result; it does not start services or claim runtime tests pass. After D6 and the first quality gate, start D7 using brownfield-clarification: **ask a genuine developer-answerable question in the chat**, one at a time, including its evidence and hypothesis; save awaiting_user state and sanitized answers in `.agent-context/clarifications.md`. Re-check any answer against code and update/revalidate impacted Docker/AGENTS/context. Respect skip/stop, and offer `/brownfield-clarify` to resume. Finish only when D7 is resolved/deferred or there were no useful questions.
 
 ## Modification boundaries
 

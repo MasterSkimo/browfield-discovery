@@ -52,6 +52,13 @@
       "evidence": [],
       "blockers": [],
       "notes": ""
+    },
+    {
+      "id": "D7",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": "Awaiting completion of D0–D6"
     }
   ]
 }

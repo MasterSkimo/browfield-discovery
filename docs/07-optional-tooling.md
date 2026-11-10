@@ -42,6 +42,10 @@ Run /brownfield-discover in the target repository from the Cursor or OpenCode ag
 
 The discovery quality gate is .agents/brownfield-discovery/scripts/validate_discovery.py --project . (invoke with Python 3.10+). It checks the generated `.e2e/compose.yaml`, source builds, safe env example and validation status as well as AGENTS.md and context; PyYAML (optional on developer machines, installed in CI) strengthens YAML/source-build checks. A gate failure is an incomplete discovery, not a successful handoff.
 
+## Resume developer clarification
+
+After the initial D0–D6 discovery, the agent starts D7 by asking the first unresolved developer-answerable question in the same chat. If the session ended while awaiting a reply, invoke `/brownfield-clarify` from the target repo in Cursor, OpenCode or T3 Code with OpenCode provider. The agent reads `.agent-context/clarifications.md`, applies new answers, updates the Docker/AGENTS handoff and asks the next question. The installer deploys both commands; existing customized files are preserved unless `--upgrade-agent-files` is specified.
+
 ## MCP integration
 
 --connect-mcp explicitly opts in to adding missing server definitions. Supported local entrypoints: basic-memory mcp and mempalace-mcp if present on PATH. Context7 uses a remote MCP connection and is explicitly registered when selected, even without --connect-mcp. The script adds missing entries to Cursor's mcpServers JSON and OpenCode v2's mcp.servers JSON; existing server definitions are preserved. JSONC is not rewritten; merge manually if one exists. Graphify stays CLI-only in this bootstrap because using its MCP needs project graph context and separate registration.

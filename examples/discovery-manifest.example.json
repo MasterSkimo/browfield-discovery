@@ -18,7 +18,8 @@
     "discovery_progress": ".agent-context/discovery-progress.json",
     "compose_file": ".e2e/compose.yaml",
     "env_example": ".e2e/.env.e2e.example",
-    "local_ignore": ".e2e/.gitignore"
+    "local_ignore": ".e2e/.gitignore",
+    "clarifications": ".agent-context/clarifications.md"
   },
   "findings": [
     {

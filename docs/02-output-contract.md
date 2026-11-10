@@ -10,7 +10,8 @@ AGENTS.md                            # operational instructions, commands and ag
   execution.md                      # known build/start/config commands (not executed unless observed)
   dependencies.md                   # local infra vs outside-app systems, configs and stubbing clues
   environment-blueprint.md          # actual created Docker files, status, remaining E2E tasks
-  discovery-progress.json           # D0-D6 workflow gates, evidence and blockers
+  discovery-progress.json           # D0-D7 workflow gates, evidence and blockers
+  clarifications.md                 # sanitized user Q&A status, answers and validation
   e2e-inventory.md                  # UI/API/async behaviors, roles, data, expected observations
   unknowns.md                       # unresolved facts and recommended targeted investigations
   verification-contract.md          # task -> change -> test -> execution evidence rules
@@ -42,8 +43,9 @@ Before any unknown is recorded, follow [the investigation protocol](08-investiga
 
 ## Status semantics
 
-- **ready_for_e2e_setup**: all D0–D6 discovery gates completed with evidence, including the **actual dedicated Compose file and environment example** covering real application builds, database/broker containers, external stubbing routes and safe E2E profiles. Remaining fixtures, stubs and tests are tracked downstream. Unknowns may remain as explicit, investigated downstream tasks.
-- **needs_investigation**: critical entry points, boundaries, access assumptions, or configuration locations are still unlocated.
+- **ready_for_e2e_setup**: all D0–D7 discovery gates completed with evidence, including the **actual dedicated Compose file and environment example** covering real application builds, database/broker containers, external stubbing routes and safe E2E profiles. Remaining fixtures, stubs and tests are tracked downstream. Unknowns may remain as explicit, investigated downstream tasks.
+- **awaiting_user_clarification**: D0–D6 created the initial handoff, and an evidence-backed user question has been asked; D7 is `awaiting_user` and the question is persisted.
+- **needs_investigation**: critical entry points, boundaries, access assumptions, or configuration locations are still unlocated, or critical blockers remain after the user's responses.
 
 Neither value means the application boots nor that E2E tests pass.
 
@@ -57,8 +59,12 @@ Neither value means the application boots nor that E2E tests pass.
 
 ## Workflow and runtime blueprint requirements
 
-The process is defined in [phases D0–D6](09-discovery-workflow.md) and recorded in `.agent-context/discovery-progress.json`. The [Compose-first contract](10-compose-first-handoff.md) is represented by `.agent-context/environment-blueprint.md`: application-owned services must be built/run as real code, alongside isolated DB/brokers and outside-boundary stubs, with dedicated E2E profiles and environment variable mappings where appropriate. Do not assume that a developer's manual run instructions are the correct autonomous setup. Discovery creates the concrete **Docker foundation** and supporting plan; it does **not start containers or implement full E2E tests/stub behavior**.
+The process is defined in [phases D0–D7](09-discovery-workflow.md) and recorded in `.agent-context/discovery-progress.json`. The [Compose-first contract](10-compose-first-handoff.md) is represented by `.agent-context/environment-blueprint.md`: application-owned services must be built/run as real code, alongside isolated DB/brokers and outside-boundary stubs, with dedicated E2E profiles and environment variable mappings where appropriate. Do not assume that a developer's manual run instructions are the correct autonomous setup. Discovery creates the concrete **Docker foundation** and supporting plan; it does **not start containers or implement full E2E tests/stub behavior**.
 
 ## Compose validation record
 
 Manifest outputs must point to `.e2e/compose.yaml` and `.e2e/.env.e2e.example`. The manifest also records `docker_validation`: `pass`, `fail` or `not_run`, exact command and a reason when not passing. A `pass` means only Compose configuration was validated; it never proves builds, startup, application health or E2E results. A real failure blocks `ready_for_e2e_setup`. The output quality gate requires valid scaffolding, a real source-build service, safe local-value exclusions and a recorded validation status.
+
+## Interactive clarification record
+
+The agent must open a real chat with the developer **after** D6 when investigated unknowns remain, not just provide a list. Save the current question, developer answer summaries, provenance, corroboration and unresolved next actions to `.agent-context/clarifications.md`; never save raw conversations or secrets. A human answer can inform an inference or decision but is not automatically verified runtime behavior. Reopen D2/D5/D6 and rerun checks if answers alter Docker or AGENTS instructions. D7 can be `awaiting_user` between sessions; use `/brownfield-clarify` to resume without rerunning D0–D6. See [the protocol](11-interactive-clarification.md).

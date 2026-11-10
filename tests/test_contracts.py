@@ -56,8 +56,13 @@ class ContractTests(unittest.TestCase):
         self.assertIn("agent: brownfield-discovery", opencode_command.read_text(encoding="utf-8"))
         self.assertIn("subagent: false", opencode_command.read_text(encoding="utf-8"))
         self.assertIn("brownfield-inference", cursor_command.read_text(encoding="utf-8"))
+        # D7 must have a shared skill plus native resume commands on both clients.
+        self.assertIn("awaiting_user", (ROOT / ".opencode/commands/brownfield-clarify.md").read_text(encoding="utf-8") + (ROOT / ".opencode/skills/brownfield-clarification/SKILL.md").read_text(encoding="utf-8"))
+        self.assertIn("brownfield-clarification", (ROOT / ".cursor/commands/brownfield-clarify.md").read_text(encoding="utf-8"))
+        self.assertIn("D7", (ROOT / ".opencode/agents/brownfield-discovery.md").read_text(encoding="utf-8"))
         expected_ids = (
             "brownfield-inference",
+            "brownfield-clarification",
             "brownfield-repository",
             "brownfield-runtime-topology",
             "brownfield-boundaries",
