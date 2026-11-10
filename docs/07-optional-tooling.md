@@ -32,7 +32,7 @@ The script does not initialize repositories, run database migrations, record or 
 
 Cursor receives its custom subagent in .cursor/agents and slash command in .cursor/commands; OpenCode v2 receives its agent in .opencode/agents and slash command in .opencode/commands. Both reuse the *same* SKILL.md files in .agents/skills; the discovery templates, schema, investigation protocol and non-mutating quality checker are copied to .agents/brownfield-discovery.
 
-Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files: identical copies are ignored and customized copies become reported conflicts. The target's AGENTS.md is not created or changed during installation.
+Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files by default: identical copies are ignored and customized copies become reported conflicts. Add --upgrade-agent-files only when you want to update previously installed brownfield resources; the installer creates a uniquely named .brownfield.bak file before replacing each existing file, and never follows destination symlinks. The target's AGENTS.md is not created or changed during installation.
 
 Cursor user-level skills in ~/.agents/skills are available to local sessions. For Cursor Cloud Agents and remote workers, install project-scoped skills into the repository (or follow Cursor's explicit skill sync mechanism).
 

@@ -96,14 +96,29 @@ def install_tool(name: str, dry_run: bool) -> bool:
     return run(args, dry_run)
 
 
-def copy_unmodified(source: Path, destination: Path, dry_run: bool) -> str:
+def copy_unmodified(source: Path, destination: Path, dry_run: bool, upgrade: bool = False) -> str:
     """Copy only new files, preserving modified or existing destination files."""
     if not source.is_file():
         raise FileNotFoundError(source)
-    if destination.exists() or destination.is_symlink():
+    if destination.is_symlink():
+        # Never follow symlinks to overwrite files outside the requested scope.
+        return "symlink (left unchanged)"
+    if destination.exists():
         if destination.is_file() and destination.read_bytes() == source.read_bytes():
             return "already current"
-        return "conflict (left unchanged)"
+        if not upgrade or not destination.is_file():
+            return "conflict (left unchanged; use --upgrade-agent-files to replace)"
+        if dry_run:
+            return "would replace with backup"
+        backup = destination.with_name(destination.name + ".brownfield.bak")
+        counter = 1
+        while backup.exists() or backup.is_symlink():
+            backup = destination.with_name(destination.name + f".brownfield.bak.{counter}")
+            counter += 1
+        # Back up user edits before performing an explicit, opt-in upgrade.
+        shutil.copy2(destination, backup)
+        shutil.copy2(source, destination)
+        return f"updated (backup: {backup})"
     if not dry_run:
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
@@ -123,7 +138,7 @@ def deployment_paths(scope: str, target: Path | None) -> tuple[Path, Path, Path]
     return home / ".cursor" / "agents", home / ".config" / "opencode" / "agents", home / ".agents"
 
 
-def deploy_clients(clients: set[str], scope: str, target: Path | None, dry_run: bool) -> None:
+def deploy_clients(clients: set[str], scope: str, target: Path | None, dry_run: bool, upgrade: bool = False) -> None:
     """Deploy one client-specific agent plus shared, discoverable skills and references."""
     cursor_dir, opencode_dir, shared = deployment_paths(scope, target)
     if not clients:
@@ -154,7 +169,7 @@ def deploy_clients(clients: set[str], scope: str, target: Path | None, dry_run: 
             if source.is_file():
                 sources.append((source, shared / "brownfield-discovery" / relative / source.relative_to(ROOT / relative)))
     for source, destination in sources:
-        outcome = copy_unmodified(source, destination, dry_run)
+        outcome = copy_unmodified(source, destination, dry_run, upgrade=upgrade)
         print(f"  {outcome}: {destination}")
 
 
@@ -277,6 +292,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--connect-mcp", action="store_true", help="Opt in to MCP registration for selected tools")
     parser.add_argument("--yes", action="store_true", help="Confirm explicitly selected operations")
     parser.add_argument("--dry-run", action="store_true", help="Preview without changing files or installing")
+    parser.add_argument("--upgrade-agent-files", action="store_true",
+                        help="Opt in to replacing deployed brownfield agent/skill/command files; make backups")
     args = parser.parse_args(argv)
     if args.scope == "project" and args.target is None:
         parser.error("--target PATH is required with --scope project")
@@ -314,7 +331,7 @@ def main(argv: list[str] | None = None) -> int:
     for name in sorted(tools):
         if install_tool(name, args.dry_run):
             successful.add(name)
-    deploy_clients(clients, args.scope, args.target, args.dry_run)
+    deploy_clients(clients, args.scope, args.target, args.dry_run, upgrade=args.upgrade_agent_files)
     # Context7 selection explicitly authorizes remote MCP registration.
     # Local memory MCP integrations still require --connect-mcp.
     mcp_names = (successful if args.connect_mcp else successful.intersection({"context7"}))

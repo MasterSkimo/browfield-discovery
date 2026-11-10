@@ -81,6 +81,12 @@ python3 scripts/setup.py --scope project --target /path/to/project --clients cur
 
 The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. The installer also deploys both provider slash commands, shared inference skill, templates, and validation script. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, or Git hook installation occurs automatically. Selecting Context7 authorizes registering its hosted MCP endpoint for the selected clients, preserving existing entries. Local memory MCP connections still require `--connect-mcp`.
 
+If you previously installed the earlier version, a default reinstall preserves existing files and reports conflicts. To explicitly replace old brownfield agent, command and skill files **with per-file backups**, add --upgrade-agent-files:
+
+~~~sh
+python3 scripts/setup.py --clients cursor,opencode --tools '' --upgrade-agent-files --yes
+~~~
+
 See [optional tooling setup](docs/07-optional-tooling.md).
 
 **Proposal status:** this is an initial contract and agent prompt, not a proven autonomous discovery implementation. It must be exercised on representative brownfield repositories before being promoted to stable.

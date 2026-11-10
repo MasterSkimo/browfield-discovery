@@ -64,6 +64,39 @@ class SetupTests(unittest.TestCase):
             setup.deploy_clients({"opencode"}, "project", root, dry_run=False)
             self.assertEqual("CUSTOM COMMAND\n", command.read_text(encoding="utf-8"))
 
+
+    def test_opt_in_upgrade_creates_backups(self) -> None:
+        # Updating a prior brownfield installation must retain customized files.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            setup.deploy_clients({"cursor"}, "project", root, dry_run=False)
+            path = root / ".cursor/agents/brownfield-discovery.md"
+            path.write_text("previous custom content\n", encoding="utf-8")
+            setup.deploy_clients({"cursor"}, "project", root, dry_run=True, upgrade=True)
+            self.assertEqual("previous custom content\n", path.read_text(encoding="utf-8"))
+            setup.deploy_clients({"cursor"}, "project", root, dry_run=False, upgrade=True)
+            self.assertEqual(
+                (ROOT / ".cursor/agents/brownfield-discovery.md").read_text(encoding="utf-8"),
+                path.read_text(encoding="utf-8"),
+            )
+            backup = root / ".cursor/agents/brownfield-discovery.md.brownfield.bak"
+            self.assertEqual("previous custom content\n", backup.read_text(encoding="utf-8"))
+
+    def test_upgrade_does_not_follow_symlinks(self) -> None:
+        # Never overwrite a symlink target as a side effect of package installation.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shared = root / "shared.md"
+            shared.write_text("keep this\n", encoding="utf-8")
+            linked = root / "AGENTS-LINK.md"
+            try:
+                linked.symlink_to(shared)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks not permitted here")
+            state = setup.copy_unmodified(ROOT / "templates/AGENTS.md", linked, False, upgrade=True)
+            self.assertIn("symlink", state)
+            self.assertEqual("keep this\n", shared.read_text(encoding="utf-8"))
+
     def test_dry_run_and_required_target(self) -> None:
         # Dry runs create nothing and project scope never assumes cwd.
         with tempfile.TemporaryDirectory() as tmp:
