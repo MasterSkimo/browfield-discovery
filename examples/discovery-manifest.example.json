@@ -38,7 +38,16 @@
     {
       "id": "ACT-1",
       "category": "investigation",
-      "description": "Example only: inspect payment adapter contract before building stub."
+      "description": "Example only: inspect payment adapter contract before building stub.",
+      "finding_ids": [
+        "DEP-1"
+      ],
+      "searched_sources": [
+        "src/integrations/PaymentClient.java",
+        "src/test/PaymentClientTest.java"
+      ],
+      "hypothesis": "The payment adapter depends on a third-party HTTP contract",
+      "why_unresolved": "External contract details cannot be confirmed from the example inputs."
     }
   ]
 }

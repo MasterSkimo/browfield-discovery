@@ -6,7 +6,11 @@
 - [ ] The agent can operate from a target project root and produce the seven listed outputs plus `AGENTS.md`.
 - [ ] No application source, infrastructure file, or pre-existing agent instruction is overwritten.
 - [ ] Source revision is recorded; findings are source-backed and labeled verified/inferred/unresolved.
-- [ ] The output is scoped to high-level architecture and E2E-relevant paths, without a class-by-class code dump.
+- [ ] The output is scoped to module-level architecture and representative UI/API/async pathways with enough depth for test setup, without a class-by-class dump.
+- [ ] Important unknowns are first investigated through implementation, configuration, tests, migrations and CI/deploy, with documented hypotheses and search trails.
+- [ ] Root AGENTS.md directly gives module map, actual working directories and exact setup/build/run/test commands, source-based conventions, security, E2E and delivery rules; links alone do not pass.
+- [ ] Discovery quality gate passes, or concrete failure is declared (never silently treated as complete).
+- [ ] /brownfield-discover is installed for both OpenCode and Cursor, with a T3/OpenCode invocation documented.
 - [ ] All detected databases and brokers have configuration locations recorded.
 - [ ] All discovered outside-application boundaries have stubbing pointers or explicit unknowns.
 - [ ] UI/API/async behavior inventories include identification of roles, data, and observable effects.

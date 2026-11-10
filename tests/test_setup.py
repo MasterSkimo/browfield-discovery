@@ -33,6 +33,10 @@ class SetupTests(unittest.TestCase):
             self.assertTrue((root / ".cursor/agents/brownfield-discovery.md").is_file())
             self.assertTrue((root / ".opencode/agents/brownfield-discovery.md").is_file())
             self.assertTrue((root / ".agents/skills/brownfield-handoff/SKILL.md").is_file())
+            self.assertTrue((root / ".agents/skills/brownfield-inference/SKILL.md").is_file())
+            self.assertTrue((root / ".cursor/commands/brownfield-discover.md").is_file())
+            self.assertTrue((root / ".opencode/commands/brownfield-discover.md").is_file())
+            self.assertTrue((root / ".agents/brownfield-discovery/scripts/validate_discovery.py").is_file())
             self.assertTrue((root / ".agents/brownfield-discovery/templates/AGENTS.md").is_file())
             self.assertTrue((root / ".agents/brownfield-discovery/schemas/task-evidence.schema.json").is_file())
 
@@ -48,6 +52,17 @@ class SetupTests(unittest.TestCase):
             agent.write_text("CUSTOM\n", encoding="utf-8")
             setup.deploy_clients({"cursor"}, "project", root, dry_run=False)
             self.assertEqual("CUSTOM\n", agent.read_text(encoding="utf-8"))
+
+
+    def test_custom_command_preserved(self) -> None:
+        # Users can customize an existing slash command without losing it on reinstall.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            command = root / ".opencode/commands/brownfield-discover.md"
+            command.parent.mkdir(parents=True)
+            command.write_text("CUSTOM COMMAND\n", encoding="utf-8")
+            setup.deploy_clients({"opencode"}, "project", root, dry_run=False)
+            self.assertEqual("CUSTOM COMMAND\n", command.read_text(encoding="utf-8"))
 
     def test_dry_run_and_required_target(self) -> None:
         # Dry runs create nothing and project scope never assumes cwd.

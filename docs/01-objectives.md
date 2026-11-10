@@ -10,9 +10,10 @@ Success means the next agent can determine what exists, where to look, what it n
 
 1. Map the repository globally: modules, entry points, build manifests, runtime components, critical integrations, deployment hints.
 2. Identify feature surfaces: UI routes, public/internal APIs, asynchronous consumers/producers, scheduled processes, role-specific entry points.
-3. Investigate **only** code paths needed to identify environment dependencies, test boundaries, data, and probable end-to-end flows.
+3. Investigate code paths **deeply enough** to reconstruct environment prerequisites and representative end-to-end flows (UI -> API -> state/event). This may require following several layers, but not every class.
 4. Stop before line-by-line or class-by-class exhaustive analysis; downstream agents investigate task-specific details.
-5. Prefer existing documentation, manifests, and code references; distinguish observed, inferred, and unresolved conclusions.
+5. Derive plausible conclusions from independent code, configuration, tests, migrations and CI/deployment clues; reserve unresolved for absent/contradictory evidence after the full investigation protocol.
+6. Produce direct, actionable AGENTS.md instructions as specified by https://agents.md/, including exact project commands, not just pointers.
 
 ## Discovery owns
 

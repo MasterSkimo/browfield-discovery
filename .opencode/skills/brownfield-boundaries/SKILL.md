@@ -13,6 +13,10 @@ description: Classify application boundaries, databases, message brokers, auth, 
 6. Flag dynamic wiring and unconfirmed Graphify relationships as inferred, not verified.
 7. Write `.agent-context/dependencies.md` and unresolved seams in `unknowns.md`.
 
+## Deep exploration requirements
+
+Triangulate dependency identity and version from package manifests, configuration, client factories, migrations, deployment and tests. Derive likely Docker DB/broker topology even if no Compose exists, with confidence=INFERRED. Trace external client call sites to request/response shape, auth and observable errors. Distinguish absent implementation from absent README. Every unknown requires a recorded search trail, strongest hypothesis and blocker.
+
 ## Classification
 
 Use `application`, `docker-db`, `docker-messaging`, `external-stub` or `unresolved`. Missing contracts/data/auth do not make a dependency impossible to test; create targeted follow-up work.

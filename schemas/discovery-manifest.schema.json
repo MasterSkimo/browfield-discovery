@@ -150,6 +150,10 @@
           "items": {
             "$ref": "#/$defs/source"
           }
+        },
+        "reasoning": {
+          "type": "string",
+          "minLength": 25
         }
       },
       "allOf": [
@@ -162,6 +166,28 @@
             }
           },
           "then": {
+            "properties": {
+              "sources": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "confidence": {
+                "const": "inferred"
+              }
+            },
+            "required": [
+              "confidence"
+            ]
+          },
+          "then": {
+            "required": [
+              "reasoning"
+            ],
             "properties": {
               "sources": {
                 "minItems": 1
@@ -198,8 +224,56 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]+-[0-9]+$"
+          },
+          "uniqueItems": true
+        },
+        "searched_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "hypothesis": {
+          "type": "string",
+          "minLength": 12
+        },
+        "why_unresolved": {
+          "type": "string",
+          "minLength": 20
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "enum": [
+                  "investigation",
+                  "developer-question"
+                ]
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "required": [
+              "searched_sources",
+              "hypothesis",
+              "why_unresolved"
+            ]
+          }
+        }
+      ]
     }
   }
 }

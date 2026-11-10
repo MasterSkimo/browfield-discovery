@@ -20,7 +20,9 @@ TOOLS = {
     "context7": ("ctx7", None),  # Hosted MCP: no local CLI is necessary.
 }
 CLIENTS = ("cursor", "opencode")
+COMMANDS = ("brownfield-discover",)
 SKILLS = (
+    "brownfield-inference",
     "brownfield-repository",
     "brownfield-boundaries",
     "brownfield-e2e-readiness",
@@ -131,11 +133,23 @@ def deploy_clients(clients: set[str], scope: str, target: Path | None, dry_run: 
         sources.append((ROOT / ".cursor/agents/brownfield-discovery.md", cursor_dir / "brownfield-discovery.md"))
     if "opencode" in clients:
         sources.append((ROOT / ".opencode/agents/brownfield-discovery.md", opencode_dir / "brownfield-discovery.md"))
+    # Client-specific slash commands are installed alongside their agents.
+    for command in COMMANDS:
+        if "cursor" in clients:
+            sources.append((ROOT / ".cursor" / "commands" / f"{command}.md",
+                            cursor_dir.parent / "commands" / f"{command}.md"))
+        if "opencode" in clients:
+            sources.append((ROOT / ".opencode" / "commands" / f"{command}.md",
+                            opencode_dir.parent / "commands" / f"{command}.md"))
     for skill in SKILLS:
         sources.append((ROOT / ".opencode" / "skills" / skill / "SKILL.md",
                         shared / "skills" / skill / "SKILL.md"))
     # Discovery templates and schemas accompany the globally installed agent.
-    for relative in ("templates", "schemas"):
+    for relative in ("templates", "schemas", "docs"):
+        # The validation script is also installed for use from any target project.
+        if relative == "docs":
+            source = ROOT / "scripts" / "validate_discovery.py"
+            sources.append((source, shared / "brownfield-discovery" / "scripts" / "validate_discovery.py"))
         for source in (ROOT / relative).rglob("*"):
             if source.is_file():
                 sources.append((source, shared / "brownfield-discovery" / relative / source.relative_to(ROOT / relative)))

@@ -14,6 +14,10 @@ description: Assemble concise AGENTS.md instructions, discovery manifest, eviden
 7. Review `git diff` or equivalent: **only** agent instructions and discovery outputs may change. No secrets.
 8. Report handoff readiness without asserting a running environment or E2E coverage.
 
+## Deep exploration requirements
+
+AGENTS.md is a WORKING GUIDE, not a file index. It must directly include actual commands and working directories for installation, build, running and tests (with evidence and declared/executed status), project/module map, code and security conventions, E2E mission and proof requirements, and links for deeper details. Only create nested AGENTS.md for real module-specific constraints. Check every unresolved against brownfield-inference and run the structural quality validator. If the gate fails, revise outputs and re-run; never claim successful completion with only generic placeholders.
+
 ## Existing instructions
 
 Preserve `AGENTS.md` and module-specific rules already present. Add non-conflicting pointers if safe; otherwise document a merge proposal and notify the caller. Never silently replace rules or claim precedence over the existing project policy.

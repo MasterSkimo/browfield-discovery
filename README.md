@@ -25,9 +25,38 @@ The discovery agent gathers the information that makes that mission possible. It
 - [Evidence and reliability rules](docs/04-reliability.md)
 - [Acceptance criteria](docs/05-acceptance.md)
 - [Optional Graphify integration](docs/06-graphify.md)
+- [Investigation and inference protocol](docs/08-investigation-protocol.md)
 - OpenCode v2 agent: [.opencode/agents/brownfield-discovery.md](.opencode/agents/brownfield-discovery.md)
 - On-demand skills under [.opencode/skills](.opencode/skills)
 - Target-project output examples under [templates](templates)
+
+## Run a complete discovery
+
+After installing the agent and commands in the **target** project or globally:
+
+~~~text
+# From T3 Code with OpenCode provider or OpenCode itself (start a new thread)
+/brownfield-discover
+
+# From Cursor's Agent input
+/brownfield-discover
+~~~
+
+The command selects the full workflow and its source-backed inference skill. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
+
+For noninteractive OpenCode runs from the target repository root:
+
+~~~sh
+opencode run --agent brownfield-discovery "Run the complete brownfield discovery for this repository, including cross-source inference, operational AGENTS.md and the quality gate."
+~~~
+
+In T3, commands must **start** the message. If the provider does not display the new slash command yet, refresh provider status and restart the agent session. If a particular T3 build does not expose the command, send the same explicit prompt to the brownfield-discovery agent; this avoids silently running a normal chat response. The structural quality gate is:
+
+~~~sh
+python3 .agents/brownfield-discovery/scripts/validate_discovery.py --project .
+~~~
+
+Use the globally installed copy from ~/.agents/brownfield-discovery/scripts when working with global agent configuration.
 
 ## Optional bootstrap for Cursor and OpenCode
 
@@ -50,7 +79,7 @@ python3 scripts/setup.py --clients cursor,opencode --tools basic-memory,mempalac
 python3 scripts/setup.py --scope project --target /path/to/project --clients cursor,opencode --tools '' --yes
 ```
 
-The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, or Git hook installation occurs automatically. Selecting Context7 authorizes registering its hosted MCP endpoint for the selected clients, preserving existing entries. Local memory MCP connections still require `--connect-mcp`.
+The package detects existing CLIs, skips upgrades, and uses an available uv or pipx for missing packages. The installer also deploys both provider slash commands, shared inference skill, templates, and validation script. Cursor and OpenCode receive client-specific agents with shared skills under `.agents/skills`. No memory import, transcript mining, graph indexing, or Git hook installation occurs automatically. Selecting Context7 authorizes registering its hosted MCP endpoint for the selected clients, preserving existing entries. Local memory MCP connections still require `--connect-mcp`.
 
 See [optional tooling setup](docs/07-optional-tooling.md).
 

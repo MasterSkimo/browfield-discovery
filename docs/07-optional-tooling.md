@@ -30,11 +30,17 @@ The script does not initialize repositories, run database migrations, record or 
 
 ## Cursor and OpenCode
 
-Cursor receives its custom subagent in .cursor/agents, OpenCode v2 its agent in .opencode/agents. Both reuse the *same* SKILL.md files in .agents/skills; the discovery templates and JSON schemas are copied to .agents/brownfield-discovery.
+Cursor receives its custom subagent in .cursor/agents and slash command in .cursor/commands; OpenCode v2 receives its agent in .opencode/agents and slash command in .opencode/commands. Both reuse the *same* SKILL.md files in .agents/skills; the discovery templates, schema, investigation protocol and non-mutating quality checker are copied to .agents/brownfield-discovery.
 
 Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files: identical copies are ignored and customized copies become reported conflicts. The target's AGENTS.md is not created or changed during installation.
 
 Cursor user-level skills in ~/.agents/skills are available to local sessions. For Cursor Cloud Agents and remote workers, install project-scoped skills into the repository (or follow Cursor's explicit skill sync mechanism).
+
+## Running full discovery
+
+Run /brownfield-discover in the target repository from the Cursor or OpenCode agent interface. In T3 Code, choose the OpenCode provider and put /brownfield-discover at the very start of the message. Reload provider configuration / restart the agent session after first installation if needed. OpenCode also supports a direct noninteractive invocation with opencode run --agent brownfield-discovery followed by the full-discovery prompt.
+
+The discovery quality gate is .agents/brownfield-discovery/scripts/validate_discovery.py --project . (invoke with Python 3.10+). A gate failure is an incomplete discovery, not a successful handoff.
 
 ## MCP integration
 

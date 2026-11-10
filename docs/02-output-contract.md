@@ -16,9 +16,9 @@ AGENTS.md                            # short, authoritative agent navigation and
 
 See [templates](../templates) and [schemas](../schemas). Prefer links over duplicating content; add module-specific instructions only if they carry a real constraint.
 
-## AGENTS.md is intentionally short
+## AGENTS.md is an operational guide
 
-Must state: scope/boundaries, how to navigate the context package, code conventions evidenced by sources, how to locate and run relevant checks, and minimum proof required to declare future work complete. It must not claim unverified commands work.
+Must give developers and agents actionable facts **in the file itself**: overview; module responsibilities and entry points; exact working directories plus installation/build/start/test commands (with declared/executed status); versions/profiles; concrete code and security conventions; E2E setup responsibilities; verification and PR expectations; pointers to deeper context. Merely linking to context files is insufficient. Declare facts derived from CI/build files as declared, not as executed. Nested AGENTS.md may be used for genuine module-specific rules.
 
 ## Source provenance
 
@@ -28,7 +28,9 @@ Each high-impact fact needs a traceable reference: relative file path plus line(
 - **inferred**: derived from code structure but not yet runtime-validated;
 - **unresolved**: unclear, contradictory, or missing.
 
-A graph edge alone is not proof of runtime behavior.
+A graph edge alone is not proof of runtime behavior. A grounded static inference is still useful and should be published as **inferred** with its reasoning chain; it should not automatically be demoted to an unknown.
+
+Before any unknown is recorded, follow [the investigation protocol](08-investigation-protocol.md), record inspected sources, best hypothesis, counterevidence and precise reason it cannot be resolved.
 
 ## Status semantics
 
@@ -43,4 +45,4 @@ Neither value means the application boots nor that E2E tests pass.
 - Where `AGENTS.md` exists, make only additive non-conflicting edits; for conflicts, write a proposed resolution in `unknowns.md` and leave original content intact.
 - Record the analyzed Git revision and warn when the current HEAD differs.
 - Sensitive values must never enter the context package. Use environment variable names or secret reference identifiers.
-- Generated files are project-specific outputs, not generic claims copied from the templates.
+- Generated files are project-specific outputs, not generic claims copied from the templates. Run the read-only gate scripts/validate_discovery.py against the target output before declaring the discovery complete; repair any reported defects.

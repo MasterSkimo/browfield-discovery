@@ -1,6 +1,6 @@
 # E2E baseline: downstream handoff requirements
 
-The *discovery* agent inventories information; the *next* agent creates the environment and E2E tests. The test boundary is the application under test, not a collection of mocked application components.
+The *discovery* agent reconstructs actionable, source-backed information; the *next* agent creates the environment and E2E tests. The test boundary is the application under test, not a collection of mocked application components.
 
 ## Target environment
 
@@ -33,3 +33,7 @@ Developers may help clarify business semantics, data invariants, and fixture des
 ## Handoff boundaries
 
 The discovery agent must not create a Docker Compose environment, write seed scripts, deploy stubs, or generate test suites. It prepares the dependency map, E2E inventory, and required verification contract for the agents that will.
+
+## Deeper investigation expectation
+
+The discovery agent must trace representative frontend routes through API calls, server behavior and state/event observations, and APIs through auth, data and external contracts. It should infer environment requirements from source, tests, config, CI and migrations even where no Docker or E2E configuration exists. Reserve 'unknown' for evidence gaps after investigation, and preserve the reasoning chain in the manifest and unknowns ledger.

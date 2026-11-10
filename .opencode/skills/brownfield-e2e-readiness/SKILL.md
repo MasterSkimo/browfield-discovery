@@ -13,6 +13,10 @@ description: Prepare an inventory of UI, API and asynchronous behaviors, identit
 6. Categorize follow-up needs as `environment`, `stub`, `data`, `identity`, `test`, or `investigation`.
 7. Write `.agent-context/e2e-inventory.md`, and connect missing facts to `unknowns.md`.
 
+## Deep exploration requirements
+
+Do not stop after listing routes: follow representative browser action -> API -> DB/message/external effect; API-only endpoint -> auth/data/response and async trigger -> consumer -> observed effect. Group by business journey without class-by-class enumeration. Infer fixtures and user roles from schemas, test builders, migrations and security config, marking assumptions. An undocumented scenario is not an untestable scenario.
+
 ## Rules
 
 Do not generate Playwright/Newman tests, create containers, or seed data. Do not mark discovered behavior `untestable`. The next agent owns E2E implementation and assertions.

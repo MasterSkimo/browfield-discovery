@@ -1,11 +1,15 @@
-# Discovery unknowns and conflicting evidence
+# Unresolved discoveries — investigation ledger
 
-| ID | Category | Question / conflict | Why it matters for E2E | Where to investigate | Owner suggestion |
+An entry is not allowed here solely because the initial read did not find an answer. Perform the investigation ladder in docs/08-investigation-protocol.md first.
+
+| ID | Narrow question | Searched code/config/test/CI sources | Best supported inference | Why it remains unresolved | Exact next action / developer input |
 | --- | --- | --- | --- | --- | --- |
-| UNK-1 | <environment/stub/data/identity/test/investigation/developer-question> | <unknown> | <impact> | <path/config/contact> | <agent/developer> |
+| {{ID}} | {{QUESTION}} | {{PATHS_AND_LOCATORS}} | {{HYPOTHESIS_OR_NONE}} | {{MISSING_OR_CONFLICTING_EVIDENCE}} | {{ACTION}} |
 
-## Existing instruction conflicts
-- <List conflicts, proposed resolution; never silently overwrite existing AGENTS.md>
+If no unknowns remain, replace the table with "No unresolved findings after investigation" and do not invent entries.
 
-## Stale findings
-- <Source revision mismatches or graph indexes requiring refresh>
+## Instruction conflicts
+List existing AGENTS.md rules that could not be merged, with paths and proposed resolution. Never overwrite them silently.
+
+## Source freshness
+Record stale/replaced graph indexes, branch changes or configurations that may need revalidation.

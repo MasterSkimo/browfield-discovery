@@ -47,7 +47,14 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(agent.startswith("---\n"))
         self.assertIn("mode: all", agent)
 
+        # Both provider-specific commands must invoke the complete discovery.
+        opencode_command = ROOT / ".opencode/commands/brownfield-discover.md"
+        cursor_command = ROOT / ".cursor/commands/brownfield-discover.md"
+        self.assertIn("agent: brownfield-discovery", opencode_command.read_text(encoding="utf-8"))
+        self.assertIn("subagent: false", opencode_command.read_text(encoding="utf-8"))
+        self.assertIn("brownfield-inference", cursor_command.read_text(encoding="utf-8"))
         expected_ids = (
+            "brownfield-inference",
             "brownfield-repository",
             "brownfield-boundaries",
             "brownfield-e2e-readiness",
