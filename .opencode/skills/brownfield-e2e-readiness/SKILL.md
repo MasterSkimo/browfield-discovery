@@ -24,3 +24,7 @@ Do not generate Playwright/Newman tests, create containers, or seed data. Do not
 ## Runtime assumptions to reject
 
 Do not assume manual app boot via IDE, local Postgres/RabbitMQ or a developer's existing `.env`. The next agent should aim for one Compose project building actual apps, with separate E2E profiles/env overrides, deterministic data/reset and all out-of-boundary integrations stubbed. Reference the environment blueprint for each test candidate.
+
+## Docker foundation created by discovery
+
+Reference **actual** `.e2e/compose.yaml` service names and the created E2E profile/env files in each test candidate. The E2E agent will finish fixtures/stubs/tests and execute Compose; discovery must create the initial Docker resources, not merely describe them.

@@ -24,6 +24,9 @@ OUTPUTS = {
     "verification_contract": ".agent-context/verification-contract.md",
     "environment_blueprint": ".agent-context/environment-blueprint.md",
     "discovery_progress": ".agent-context/discovery-progress.json",
+    "compose_file": ".e2e/compose.yaml",
+    "env_example": ".e2e/.env.e2e.example",
+    "local_ignore": ".e2e/.gitignore",
 }
 
 
@@ -48,7 +51,7 @@ def make_fixture(root: Path) -> dict:
     text = "# AGENTS.md — Sample API\n\n" + "\n\n".join(f"## {title}\n{body}" for title, body in sections.items())
     (root / "AGENTS.md").write_text(text, encoding="utf-8")
     for name, path in OUTPUTS.items():
-        if name in ("agent_instructions", "discovery_progress"):
+        if name in ("agent_instructions", "discovery_progress", "compose_file", "env_example", "local_ignore"):
             continue
         f = root / path
         f.parent.mkdir(parents=True, exist_ok=True)
@@ -62,6 +65,21 @@ def make_fixture(root: Path) -> dict:
             )
         else:
             f.write_text("# Context\nInspected code reference from pom.xml.\n", encoding="utf-8")
+    # Actual Docker foundation is part of the discovery fixture.
+    docker = root / ".e2e/docker"
+    docker.mkdir(parents=True)
+    (docker / "app.Dockerfile").write_text(
+        "FROM eclipse-temurin:21-jre\nWORKDIR /app\nCOPY . .\n", encoding="utf-8"
+    )
+    (root / ".e2e/compose.yaml").write_text(
+        "name: sample-e2e\nservices:\n"
+        "  app:\n    build:\n      context: ..\n"
+        "      dockerfile: .e2e/docker/app.Dockerfile\n"
+        "    environment:\n      APP_PROFILE: e2e\n"
+        "  db:\n    image: postgres:16\n", encoding="utf-8"
+    )
+    (root / ".e2e/.env.e2e.example").write_text("APP_PROFILE=e2e\n", encoding="utf-8")
+    (root / ".e2e/.gitignore").write_text(".env.e2e.local\n*.secret\n", encoding="utf-8")
     # A complete readiness claim requires seven sequential phase gates with file evidence.
     progress = {
         "schema_version": "0.1.0",
@@ -77,6 +95,11 @@ def make_fixture(root: Path) -> dict:
         "schema_version": "0.1.0",
         "repository": {"name": "sample", "revision": "0123456789abcdef", "analyzed_at": "2026-11-10T10:00:00Z"},
         "status": "ready_for_e2e_setup", "outputs": OUTPUTS,
+        "docker_validation": {
+            "status": "not_run",
+            "command": "docker compose -f .e2e/compose.yaml --env-file .e2e/.env.e2e.example config --quiet",
+            "reason": "Synthetic fixture; Docker Compose not executed."
+        },
         "findings": [{"id": "ARC-1", "statement": "Maven build", "confidence": "verified",
                       "sources": [{"path": "pom.xml", "locator": "root"}]},
                      {"id": "APP-1", "statement": "Backend entry", "confidence": "inferred",
@@ -172,6 +195,40 @@ class GateTests(unittest.TestCase):
             path = root / OUTPUTS["environment_blueprint"]
             path.write_text("# Later\nTBD\n", encoding="utf-8")
             self.assertTrue(any("environment blueprint" in x for x in gate.collect_problems(root)))
+
+
+    def test_missing_compose_and_env_are_rejected(self) -> None:
+        # Discovery cannot hand off only a blueprint without Docker resources.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            make_fixture(root)
+            (root / ".e2e/compose.yaml").unlink()
+            (root / ".e2e/.env.e2e.example").unlink()
+            errors = gate.collect_problems(root)
+            self.assertTrue(any("output missing" in e and "compose_file" in e for e in errors))
+            self.assertTrue(any("output missing" in e and "env_example" in e for e in errors))
+
+    def test_empty_compose_template_rejected(self) -> None:
+        # An empty example must never pass as a real application Docker foundation.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            make_fixture(root)
+            (root / ".e2e/compose.yaml").write_text(
+                "name: demo\nservices: {}\n", encoding="utf-8"
+            )
+            self.assertTrue(any("Docker foundation" in e for e in gate.collect_problems(root)))
+
+    def test_compose_validation_failure_blocks_handoff(self) -> None:
+        # Failed config parsing must prevent a ready_for_e2e_setup claim.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = make_fixture(root)
+            manifest["docker_validation"]["status"] = "fail"
+            manifest["docker_validation"]["reason"] = "Compose interpolation error"
+            (root / ".agent-context/manifest.json").write_text(
+                json.dumps(manifest), encoding="utf-8"
+            )
+            self.assertTrue(any("blocks E2E handoff" in e for e in gate.collect_problems(root)))
 
     def test_unreplaced_template_fails(self) -> None:
         # A generated guide cannot retain authoring placeholders.

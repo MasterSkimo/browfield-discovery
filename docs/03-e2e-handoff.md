@@ -1,6 +1,6 @@
 # E2E baseline: downstream handoff requirements
 
-The *discovery* agent reconstructs actionable, source-backed information; the *next* agent creates the environment and E2E tests. The test boundary is the application under test, not a collection of mocked application components.
+The *discovery* agent reconstructs actionable, source-backed information; the Discovery Agent **creates its dedicated Docker foundation**, and the *next* agent completes the environment and E2E tests. The test boundary is the application under test, not a collection of mocked application components.
 
 ## Target environment
 
@@ -32,7 +32,7 @@ Developers may help clarify business semantics, data invariants, and fixture des
 
 ## Handoff boundaries
 
-The discovery agent must not create a Docker Compose environment, write seed scripts, deploy stubs, or generate test suites. It prepares the dependency map, E2E inventory, and required verification contract for the agents that will.
+The Discovery Agent **must create** the `.e2e/compose.yaml`, application Dockerfiles when needed, separate E2E application config/profiles when required, safe environment example and stubbing integration wiring. It does **not** start infrastructure, write complete seed scripts, implement full external stubs, or generate Playwright/Newman suites. The E2E agent completes and verifies the stack.
 
 ## Deeper investigation expectation
 
@@ -40,4 +40,4 @@ The discovery agent must trace representative frontend routes through API calls,
 
 ## Autonomous runtime strategy
 
-The future E2E agent should not follow a human developer setup by default (IDE, individually launched apps, manually provisioned DB or broker). Prefer a single Docker Compose project that builds all in-scope app images from the source checkout and runs supporting DB/broker/stub services; optional profiles select test runners or debug tools. Application-specific E2E profiles/files may be created separately from developer configuration and wired with Compose environment variables and env_file as necessary. The discovery agent identifies exact candidates, sources and constraints in `.agent-context/environment-blueprint.md` but does not implement them. See [the runtime contract](10-compose-first-handoff.md).
+The future E2E agent should not follow a human developer setup by default (IDE, individually launched apps, manually provisioned DB or broker). Prefer a single Docker Compose project that builds all in-scope app images from the source checkout and runs supporting DB/broker/stub services; optional profiles select test runners or debug tools. Application-specific E2E profiles/files may be created separately from developer configuration and wired with Compose environment variables and env_file as necessary. The discovery agent implements the **initial Docker composition/configuration** and records the exact created paths, sources, gaps and validation status in `.agent-context/environment-blueprint.md`. See [the runtime contract](10-compose-first-handoff.md).

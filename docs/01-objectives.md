@@ -2,7 +2,7 @@
 
 ## Mission
 
-An information-only reconnaissance pass prepares a brownfield codebase for autonomous development agents. The first downstream task is creation of a complete, reproducible E2E characterization baseline.
+An evidence-led reconnaissance pass prepares a brownfield codebase **and creates its dedicated E2E Docker foundation** for autonomous development agents. The first downstream task is creation of a complete, reproducible E2E characterization baseline.
 
 Success means the next agent can determine what exists, where to look, what it needs to run, what must be stubbed, how to obtain test data, and how to prove its work, **without repeating a general repository survey**.
 
@@ -18,22 +18,22 @@ Success means the next agent can determine what exists, where to look, what it n
 ## Discovery owns
 
 - An agent instruction entrypoint and discoverable, compact references.
-- Runtime/dependency inventory and boundary classification, plus a Compose-first full-application environment blueprint for downstream agents.
+- Runtime/dependency inventory and boundary classification, a Compose-first environment blueprint, and **real dedicated `.e2e/` Compose/Dockerfiles/config scaffolding** for downstream agents.
 - E2E inventory: journeys, endpoints, async triggers and observable effects, known roles/identities, relevant data, and follow-up tasks.
 - Required engineering evidence format and completion rules.
 - Transparent unknowns, conflicting evidence, and source revision/freshness.
 
 ## Discovery does not own
 
-- Build fixes, refactors, application code or infra changes.
-- Running or provisioning the entire stack, Docker, brokers or databases. Future agents may do that through a dedicated Compose environment; discovery must supply the information rather than assuming manual IDE-based startup.
+- Build fixes, refactors, application source or developer/production infrastructure changes. New **isolated E2E Docker infrastructure files** are in scope.
+- Starting or mutating running DBs, brokers or application services; the E2E agent validates startup/runtime. Discovery may run a **non-mutating Compose configuration check**, but must record whether it actually ran.
 - Implementing external service stubs or data seed scripts.
 - Writing Playwright/Newman suites or promising E2E coverage.
 - Inventing business requirements or producing exhaustive functional specifications.
 
 ## Non-negotiables
 
-- No application source modifications.
+- No application source or developer/prod configuration modifications. Discovery may create/update owned `.e2e/` files and non-conflicting agent context.
 - No secrets in generated files or captured evidence; report secret *names* only.
 - No destructive or environment-mutating commands as part of discovery.
 - Never state a tool or execution was successful if not observed.
@@ -42,4 +42,4 @@ Success means the next agent can determine what exists, where to look, what it n
 
 ## Discovery process
 
-Execute phases D0–D6 in [the proposed workflow](09-discovery-workflow.md), recording progress and source-backed phase gates. Complete an [environment blueprint](10-compose-first-handoff.md) before the E2E handoff. This is a reviewable process definition; it does not authorize discovery to create Docker Compose files or modify application configuration.
+Execute phases D0–D6 in [the proposed workflow](09-discovery-workflow.md), recording progress and source-backed phase gates. Complete an [environment blueprint](10-compose-first-handoff.md) before the E2E handoff. This process **requires** discovery to create a dedicated `.e2e/compose.yaml` and required Dockerfiles/E2E configuration (without modifying developer configuration). The E2E agent completes stubs, data, runnable integration and tests.

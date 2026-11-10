@@ -10,7 +10,8 @@
     "status",
     "outputs",
     "findings",
-    "next_actions"
+    "next_actions",
+    "docker_validation"
   ],
   "properties": {
     "schema_version": {
@@ -57,7 +58,10 @@
         "unknowns",
         "verification_contract",
         "environment_blueprint",
-        "discovery_progress"
+        "discovery_progress",
+        "compose_file",
+        "env_example",
+        "local_ignore"
       ],
       "properties": {
         "agent_instructions": {
@@ -95,6 +99,18 @@
         "discovery_progress": {
           "type": "string",
           "minLength": 1
+        },
+        "compose_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "env_example": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_ignore": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -109,6 +125,55 @@
       "items": {
         "$ref": "#/$defs/action"
       }
+    },
+    "docker_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_run"
+          ]
+        },
+        "command": {
+          "type": "string",
+          "minLength": 10
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "fail",
+                  "not_run"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "minLength": 10
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "$defs": {

@@ -1,41 +1,37 @@
-# Proposed Brownfield Discovery workflow
+# Brownfield discovery workflow — proposed v0.2
 
-Discovery remains **information-only**. It prepares agents to build a reproducible E2E environment; it does not provision that environment. A developer's manual workflow is evidence to investigate, **not the assumed runtime model**.
+Discovery produces a usable Docker foundation, not just plans. The downstream E2E agent adds complete stub behavior, data, automated scenarios and runtime validation. Never assume human IDE/manual startup is the right execution model.
 
-Run each phase in order and record progress in .agent-context/discovery-progress.json. Revisit earlier phases when later evidence invalidates their conclusions.
-
-| Phase | Activities | Exit gate |
+| Phase | Discovery work | Exit condition |
 | --- | --- | --- |
-| D0 — Reconnaissance | Record Git revision, existing instructions, modules, CI/build/deploy/tests | Current revision, source inventory and protected preexisting instructions |
-| D1 — Application map | Identify executable application components, UI, API, workers, messaging, ownership | Every important application component has a mapped entry point and owner |
-| D2 — Runtime topology | Infer app build/start, DB/broker, external stub, Compose services, dedicated app profiles, env-key precedence, readiness | Source-backed **full-stack Compose-first** blueprint completed, with explicit gaps |
-| D3 — Behavior tracing | Trace representative UI -> API -> state/event and API-only + async flows | E2E candidates have entry, role, fixture assumptions, observable effects |
-| D4 — Data and boundaries | Map DB migration/seed/reset, brokers, external contracts, test identity and failure behavior | Next agent knows what to build/reuse and what needs developer input |
-| D5 — Autonomous inference | Revisit every unknown via config, code, tests, migrations, CI, Graphify leads, counterevidence | Only justified unknowns remain, each with a search trail and next action |
-| D6 — Operational handoff | Generate AGENTS.md, supporting context, verification rules and validate it | Quality gate passes; source files unchanged; status accurately reported |
+| D0 — Reconnaissance | Inspect Git revision, existing instructions and manifests, CI/build/deploy | Source inventory and revision recorded |
+| D1 — Application map | Identify real app modules, entry points, UI/API/async paths and owners | All executable components and boundaries mapped |
+| D2 — Docker foundation | Create .e2e/compose.yaml, required Dockerfiles and isolated E2E profiles/env example | Real app services, DB/brokers and external stubbing routes represented; scaffold exists and gaps recorded |
+| D3 — Behavior tracing | Explore representative UI -> API -> state/message, API-only and async paths | Candidate E2E cases with inputs, roles and assertions |
+| D4 — Data and integrations | Map fixtures/migrations/reset, auth and external contracts | Concrete work items for the E2E agent |
+| D5 — Independent inference | Revisit all unknowns and update Docker files using corroborated source evidence | Only justified unknowns remain and D2 stays consistent |
+| D6 — Handoff and quality gate | Generate operational AGENTS.md, sources, progress and checks | Docker scaffold and metadata validated; existing app/dev config unchanged |
 
-## Phase discipline
+Maintain .agent-context/discovery-progress.json with evidence and blockers for every phase. Proceed sequentially, reopening a previous phase if findings invalidate it. A phase cannot be done merely because a Markdown file exists.
 
-1. Read checkpoint and verify current commit before starting any phase.
-2. Explore the phase using source-backed evidence. Corroborated static deductions are INFERRED, not automatically UNKNOWN.
-3. Record evidence paths and conclusions in the progress record; mark done only with adequate evidence, otherwise blocked or in_progress.
-4. Do not advance to later phases with an incomplete earlier gate.
-5. Reopen earlier phases if a later discovery contradicts them.
-6. Run final quality checks and report blockers; do not claim an executable Docker environment or passing E2E tests.
+## D2 rules
 
-The quality gate checks structure and declared progress, not whether Docker, brokers or application code ran.
+- Discovery is permitted to create and edit **dedicated .e2e/** Compose, Dockerfiles and application E2E config, a nonsecret env example, plus additive .gitignore rules. It must **not modify application source, normal developer/prod configs, existing developer Compose/Dockerfiles, or migrations**.
+- Each in-scope frontend, backend, worker, consumer or scheduler requiring its own process is represented as a **real** service with a source build context. Do not replace application code with stubs.
+- Include detected DB and broker services, container DNS, environment mappings and health/readiness dependencies. Select source-grounded image versions.
+- Route every external call to a test-controlled boundary or explicitly record a blocking wiring gap. Full stub behavior is downstream.
+- Create separate E2E application profiles/configuration if needed and wire them into Compose through supported environment variables, env_file or mounted config. Do not assume developer settings can safely be reused.
+- Distinguish Compose service-selection profiles from app runtime profiles. Keep required services in the default Compose set.
+- Create .e2e/.env.e2e.example with safe defaults/names; ignore .e2e/.env.e2e.local and never write real credentials.
+- If Docker Compose is available, run its **non-mutating config validation** and record pass/fail, command and evidence. Do not execute up, down -v, migrations or tests in discovery.
+- Unimplemented stubs, fixture loading and E2E tests remain explicit follow-up tasks. Do not fabricate readiness or a passing build.
 
-## Tooling
+## Readiness
 
-Graphify may accelerate navigation, Context7 may explain public framework behavior, and developer-authorized memories may suggest previous decisions. Current checked-out code/configuration remains the source of truth. Never automatically mine private conversations.
+ready_for_e2e_setup requires D0–D6 done with evidence and a concrete Docker foundation that passes the structural gate. If a Compose config check was possible and failed, the failure blocks readiness. If Docker was unavailable, record not_run and the reason; the E2E agent must perform runtime checks later.
 
-## Completion semantics
+needs_investigation means a required component, scaffold or handoff rule could not be established without further investigation.
 
-- ready_for_e2e_setup means D0–D6 are done with supported evidence; next agents can build the stack without repeating general discovery. No claim is made that Docker or E2E tests ran.
-- needs_investigation means a critical gate is incomplete/blocked or a source mapping is missing.
+## Review decisions
 
-## Review topics
-
-- D2 currently produces a **blueprint**, not an actual compose.yaml. Do we want discovery to create a draft Compose file later?
-- D3 currently inventories all discovered entry surfaces and deeply traces representative flows, rather than every class.
-- D6 currently uses a structural validator and later real-project acceptance tests; independent agent review can be added.
+The present boundary is: discovery creates Docker scaffolding and isolated E2E configurations; the E2E agent completes stubs, fixtures, Playwright/Newman and runtime verification. Build/start/health validation can be expanded later.

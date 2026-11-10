@@ -15,7 +15,10 @@
     "unknowns": ".agent-context/unknowns.md",
     "verification_contract": ".agent-context/verification-contract.md",
     "environment_blueprint": ".agent-context/environment-blueprint.md",
-    "discovery_progress": ".agent-context/discovery-progress.json"
+    "discovery_progress": ".agent-context/discovery-progress.json",
+    "compose_file": ".e2e/compose.yaml",
+    "env_example": ".e2e/.env.e2e.example",
+    "local_ignore": ".e2e/.gitignore"
   },
   "findings": [
     {
@@ -51,5 +54,10 @@
       "hypothesis": "The payment adapter depends on a third-party HTTP contract",
       "why_unresolved": "External contract details cannot be confirmed from the example inputs."
     }
-  ]
+  ],
+  "docker_validation": {
+    "status": "not_run",
+    "command": "docker compose -f .e2e/compose.yaml --env-file .e2e/.env.e2e.example config --quiet",
+    "reason": "Illustrative example; Docker Compose was not invoked."
+  }
 }

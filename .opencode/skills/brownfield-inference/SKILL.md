@@ -25,3 +25,7 @@ The skill does not modify application files, start infrastructure, create test d
 ## Docker-oriented deduction
 
 If README tells developers to manually start apps or services, cross-check CI/build/containers to deduce how a downstream agent can build them as images. Infer E2E profile names/variable overrides only with configuration evidence; propose dedicated test configuration when existing profiles are unsuitable. A missing existing Compose file is not an unknown runtime architecture.
+
+## Docker artifacts as evidence
+
+The absence of an existing compose file should trigger **creation** of the isolated `.e2e/compose.yaml` and required app Dockerfiles, not escalation as an unknown. Ground images, build contexts and app configuration names in actual source/build/deploy evidence, and record incomplete stub/data/test work for the next agent.

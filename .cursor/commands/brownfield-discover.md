@@ -6,6 +6,6 @@ Do the investigation now, not merely propose a plan. Trace concrete app paths, r
 
 Generate a real AGENTS.md with direct project-specific setup, build, run, test commands, module map, conventions, security, E2E responsibilities and evidence rules. Produce the .agent-context files and run the quality gate if available. Correct deficient output and report status.
 
-No application code, Docker, stubs, data scripts or E2E tests are to be created in this discovery mission.
+Create **actual dedicated Docker Compose, app Dockerfiles/profiles and E2E env example**. Do not alter application source or dev/prod configs, start services, run destructive commands or implement full stubs, data scripts and E2E tests.
 
-Derive a full-stack Compose-first environment blueprint for future agents, including building actual apps, DB/broker containers, external stubs and dedicated E2E application profiles/environment overrides. The discovery agent must not implement those files.
+Derive a full-stack Compose-first environment blueprint for future agents, including building actual apps, DB/broker containers, external stubs and dedicated E2E application profiles/environment overrides. The discovery agent **must implement the initial Docker files** and record evidence/Compose config validation. The E2E agent completes fixtures, stubs, Playwright/Newman and runtime checks.

@@ -24,3 +24,7 @@ Use `application`, `docker-db`, `docker-messaging`, `external-stub` or `unresolv
 ## Compose-first topology evidence
 
 Record how the full application could run as real containers plus DB/broker and outside-service stubs. Look for env-based endpoint overrides, existing runtime profiles, build contexts, network aliases and health checks. Assume neither a human IDE workflow nor access to developer databases. Hand the results to brownfield-runtime-topology; do not create Compose files.
+
+## Dedicated Docker scaffold ownership
+
+Discovery must reflect detected databases, brokers and external boundaries in real `.e2e/compose.yaml` service definitions/configuration, with environment overrides and isolated runtime profiles where needed. The E2E agent later implements stub behavior; do not leave unbounded production network calls. Do not modify developer Compose/profiles.

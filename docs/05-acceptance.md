@@ -31,5 +31,15 @@ This PR proposes these criteria; real brownfield acceptance runs are **not** cla
 - [ ] A Compose-first environment blueprint specifies all real application builds, DB/brokers, outside-boundary stubs, service DNS, health, E2E test runners, data/reset and isolation.
 - [ ] Distinguishes Compose service-selection profiles from application runtime profiles and documents separate E2E configurations / environment-variable overrides.
 - [ ] Does not assume a developer's IDE and manually started applications are the E2E execution strategy.
-- [ ] No Docker Compose, Dockerfile, fixture, stub or application environment file is created by the Discovery Agent; these belong to the downstream E2E-bootstrap task.
+- [ ] Discovery **creates Compose, E2E Dockerfiles and E2E-only application profiles/environment files** while preserving developer/prod configuration; full stubs/fixtures/tests belong downstream.
 - [ ] Phase gates are reviewed after deeper discoveries; evidence and source revision are consistent.
+
+## Concrete Docker artifacts
+
+- [ ] The generated target includes `.e2e/compose.yaml` with **real** app services built from project sources and DB/broker services detected from code/config.
+- [ ] Project-specific Dockerfiles under `.e2e/docker/` exist where existing build definitions are insufficient, and app startup wiring uses dedicated E2E config when appropriate.
+- [ ] `.e2e/.env.e2e.example` includes safe non-secret keys/defaults; `.e2e/.gitignore` excludes `.env.e2e.local` and local credentials.
+- [ ] External integration endpoints have explicit E2E-safe stubbing routes or a documented wiring blocker; no accidental real endpoint use is assumed.
+- [ ] The agent attempted a non-mutating `docker compose config --quiet` when available and recorded status/command/reason; it does not claim unexecuted builds/tests pass.
+- [ ] The quality gate checks actual Docker artifacts, not only `environment-blueprint.md`.
+- [ ] E2E agent ownership remains: final stubs/fixtures/seed-reset, Playwright/Newman, health/start/runtime and test execution.

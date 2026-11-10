@@ -2,7 +2,7 @@
 
 Prepare an **existing** software project so autonomous development agents can work on it without repeating a repository-wide investigation.
 
-This repository contains a **proposal (v0.1)** for an information-only discovery agent. The agent prepares instructions and targeted knowledge; it does **not** provision infrastructure, repair application code, create stubs, seed data, or implement tests.
+This repository contains a **proposal (v0.2)** for a discovery agent that investigates the application and **creates the dedicated E2E Docker foundation** (Compose, application build definitions and isolated configuration). It never rewrites the real application or developer profiles and does not implement complete stubs, seed data or tests.
 
 ## Target outcome
 
@@ -15,7 +15,7 @@ The first downstream mission is to build a reproducible E2E characterization bas
 - exercise UI journeys with Playwright and API-only journeys with Newman;
 - link observed behaviors, acceptance criteria, test executions, and evidence.
 
-The discovery agent gathers the information that makes that mission possible. It does not carry out the mission. The E2E-bootstrap agent is not expected to behave like a developer with IDE-launched components: its preferred target is a self-contained Docker Compose project that **builds and runs the real applications**, databases, brokers, external stubs and test runners as needed, with dedicated application profiles/config and environment overrides.
+The discovery agent gathers the information **and creates the Docker starting point** for that mission. The E2E agent finishes the stubs, data and verification. The E2E-bootstrap agent is not expected to behave like a developer with IDE-launched components: its preferred target is a self-contained Docker Compose project that **builds and runs the real applications**, databases, brokers, external stubs and test runners as needed, with dedicated application profiles/config and environment overrides.
 
 ## What this proposal includes
 
@@ -44,7 +44,7 @@ After installing the agent and commands in the **target** project or globally:
 /brownfield-discover
 ~~~
 
-The command follows phases D0–D6 from [the workflow](docs/09-discovery-workflow.md), records progress, prepares a Compose-first runtime blueprint and invokes source-backed inference. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
+The command follows phases D0–D6 from [the workflow](docs/09-discovery-workflow.md), records progress, **creates .e2e/compose.yaml, Dockerfiles and E2E profiles/env example when required**, documents their status, and invokes source-backed inference. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
 
 For noninteractive OpenCode runs from the target repository root:
 
@@ -92,3 +92,7 @@ python3 scripts/setup.py --clients cursor,opencode --tools '' --upgrade-agent-fi
 See [optional tooling setup](docs/07-optional-tooling.md).
 
 **Proposal status:** this is an initial contract and agent prompt, not a proven autonomous discovery implementation. It must be exercised on representative brownfield repositories before being promoted to stable.
+
+## Concrete Docker handoff
+
+Discovery produces `.e2e/compose.yaml`, `.e2e/.env.e2e.example`, `.e2e/.gitignore` and project-specific Dockerfiles/configuration under `.e2e/` where necessary. It also writes `.agent-context/environment-blueprint.md` with actual created paths, service boundaries and remaining downstream work. If Docker Compose is available it attempts `docker compose -f .e2e/compose.yaml --env-file .e2e/.env.e2e.example config --quiet`, recording the actual result. **This is not a passing application build or E2E run.** The next agent completes test data, stubs, Playwright/Newman and execution evidence. See [the workflow](docs/09-discovery-workflow.md) and [Docker contract](docs/10-compose-first-handoff.md).

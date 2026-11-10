@@ -73,6 +73,16 @@ class ContractTests(unittest.TestCase):
             self.assertRegex(content, r"(?m)^description: .+")
             self.assertIn(name, agent)
 
+    def test_docker_foundation_is_part_of_the_contract(self) -> None:
+        # Discovery must create project-specific Compose, env and ignore files.
+        manifest = load_json("examples/discovery-manifest.example.json")
+        self.assertEqual(".e2e/compose.yaml", manifest["outputs"]["compose_file"])
+        self.assertEqual(".e2e/.env.e2e.example", manifest["outputs"]["env_example"])
+        self.assertEqual("not_run", manifest["docker_validation"]["status"])
+        source = (ROOT / ".opencode/skills/brownfield-runtime-topology/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn(".e2e/compose.yaml", source)
+        self.assertIn("creates", source.lower())
+
     def test_evidence_examples_do_not_fake_execution(self) -> None:
         # The seeded example must never pretend Playwright or Newman ran.
         example = load_json("examples/task-evidence.example.json")

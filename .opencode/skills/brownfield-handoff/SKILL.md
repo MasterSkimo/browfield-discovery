@@ -11,8 +11,8 @@ description: Assemble concise AGENTS.md instructions, discovery manifest, eviden
 4. Provide `verification-contract.md` for AC -> changes -> automated assertions -> execution artifacts -> outcome.
 5. Complete `manifest.json` with analyzed revision, actual artifact paths, findings and status; never leave template placeholders in completed output.
 6. Capture unknowns, conflicts and developer questions in `unknowns.md` with next steps.
-7. Review `git diff` or equivalent: **only** agent instructions and discovery outputs may change. No secrets.
-8. Report handoff readiness without asserting a running environment or E2E coverage.
+7. Review `git diff` or equivalent: **only** generated agent context, dedicated `.e2e/` Docker foundation and narrowly scoped ignore rules may change. No application/source/dev config edits or secrets.
+8. Report actual Compose file, Dockerfiles, dedicated app profiles, environment example and non-mutating Compose config validation status. Do not assert running containers, built images or E2E coverage.
 
 ## Deep exploration requirements
 
@@ -24,4 +24,4 @@ Preserve `AGENTS.md` and module-specific rules already present. Add non-conflict
 
 ## Workflow handoff
 
-Before completion, require D0–D6 progression with evidence in `.agent-context/discovery-progress.json`. Verify the Compose-first `.agent-context/environment-blueprint.md` describes all real apps, required DBs/brokers, outside-service stubs, profile/env wiring, readiness and fixture resets. Include the runtime strategy directly in AGENTS.md, while linking to the detailed blueprint. Never claim provisioning or build success that did not occur.
+Before completion, require D0–D6 progression with evidence in `.agent-context/discovery-progress.json`. Verify **actual** `.e2e/compose.yaml`, `.e2e/.env.e2e.example`, Dockerfiles/profiles where needed and `.e2e/.gitignore` exist; `.agent-context/environment-blueprint.md` must describe their sources, all app/DB/broker services, external stub wiring, profile/env settings, config-check result, fixture/reset tasks and gaps. Include the runtime strategy directly in AGENTS.md, while linking to the detailed blueprint. Never claim provisioning or build success that did not occur.

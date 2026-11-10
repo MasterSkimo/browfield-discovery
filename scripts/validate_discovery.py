@@ -9,6 +9,12 @@ from pathlib import Path
 import re
 import sys
 
+# PyYAML is an optional extra for inspecting Compose service structure.
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
 
 SECTIONS = (
     "Project overview", "Repository map", "Setup commands", "Build and run",
@@ -20,6 +26,7 @@ OUTPUTS = (
     "agent_instructions", "architecture", "execution", "dependencies",
     "e2e_inventory", "unknowns", "verification_contract",
     "environment_blueprint", "discovery_progress",
+    "compose_file", "env_example", "local_ignore",
 )
 PLACEHOLDER = re.compile(r"\{\{[^}]+\}\}|<PROJECT NAME>|<ADD ONLY|<SOURCE-BACKED|\bPROJECT_NAME\b|\bAPP_MODULES_WITH_PATHS\b|\bEVIDENCE_AND_ACTIONS\b|\bREVISION_REPLACE_WITH_REAL_SHA\b", re.IGNORECASE)
 HEADING = re.compile(r"(?m)^#{2,3}\s+(.+?)\s*$")
@@ -115,6 +122,75 @@ def collect_problems(project: Path) -> list[str]:
             issues.append("environment blueprint lacks full-stack Compose/build/config/boundary details")
         if len(blueprint_text.strip()) < 250:
             issues.append("environment blueprint is too short for actionable setup planning")
+
+    # The actual E2E Docker foundation is a required output, not an optional plan.
+    compose_name = outputs.get("compose_file")
+    compose_path = under_project(project, compose_name) if isinstance(compose_name, str) else None
+    if compose_name != ".e2e/compose.yaml":
+        issues.append("Compose foundation must be .e2e/compose.yaml")
+    if compose_path and compose_path.is_file():
+        body = compose_path.read_text(encoding="utf-8")
+        if yaml is not None:
+            try:
+                compose_data = yaml.safe_load(body)
+            except yaml.YAMLError as exc:
+                compose_data = None
+                issues.append(f"Compose YAML is invalid: {exc}")
+            services = compose_data.get("services") if isinstance(compose_data, dict) else None
+            if not isinstance(services, dict) or not services:
+                issues.append("Docker foundation must contain actual Compose services")
+            elif not any(isinstance(s, dict) and s.get("build") for s in services.values()):
+                issues.append("Docker foundation has no real source-built application service")
+            else:
+                # Verify source-build contexts and referenced Dockerfiles are part of the checkout.
+                for service_name, service in services.items():
+                    if not isinstance(service, dict) or not service.get("build"):
+                        continue
+                    build = service["build"]
+                    context_str = build if isinstance(build, str) else build.get("context", ".") if isinstance(build, dict) else None
+                    if not isinstance(context_str, str) or "$" in context_str:
+                        issues.append(f"{service_name}: unresolved Docker build context")
+                        continue
+                    context_path = (compose_path.parent / context_str).resolve()
+                    if not context_path.is_dir() or not context_path.is_relative_to(project):
+                        issues.append(f"{service_name}: missing or unsafe Docker build context")
+                        continue
+                    df = "Dockerfile" if not isinstance(build, dict) else build.get("dockerfile", "Dockerfile")
+                    dockerfile_path = context_path / df if isinstance(df, str) else None
+                    if dockerfile_path is None or not dockerfile_path.is_file() or not dockerfile_path.resolve().is_relative_to(project):
+                        issues.append(f"{service_name}: Dockerfile is missing or outside checkout")
+        else:
+            # The stdlib fallback rejects the unpopulated template but cannot prove YAML syntax.
+            if not re.search(r"(?m)^services:\s*$", body) or not re.search(r"(?m)^\s+build:\s*(?:$|[^#\s])", body):
+                issues.append("Docker foundation has no real source-built Compose service")
+    env_name = outputs.get("env_example")
+    env_path = under_project(project, env_name) if isinstance(env_name, str) else None
+    if env_name != ".e2e/.env.e2e.example":
+        issues.append("E2E environment example must be .e2e/.env.e2e.example")
+    if env_path and env_path.is_file():
+        env_text = env_path.read_text(encoding="utf-8")
+        if not re.search(r"(?m)^[A-Za-z_][A-Za-z0-9_]*\s*=\s*\S+", env_text):
+            issues.append("E2E env example needs nonsecret variable declarations")
+    ignore_name = outputs.get("local_ignore")
+    ignore_path = under_project(project, ignore_name) if isinstance(ignore_name, str) else None
+    if ignore_name != ".e2e/.gitignore":
+        issues.append("E2E local value ignore must be .e2e/.gitignore")
+    if ignore_path and ignore_path.is_file():
+        if ".env.e2e.local" not in ignore_path.read_text(encoding="utf-8"):
+            issues.append("E2E local values must be ignored from Git")
+    validation = manifest.get("docker_validation")
+    if not isinstance(validation, dict):
+        issues.append("manifest must record Docker Compose config validation")
+    else:
+        status = validation.get("status")
+        if status not in ("pass", "fail", "not_run"):
+            issues.append("invalid Docker Compose validation status")
+        if status == "fail" and manifest.get("status") == "ready_for_e2e_setup":
+            issues.append("failed Docker Compose config check blocks E2E handoff readiness")
+        if status in ("not_run", "fail") and len(str(validation.get("reason", ""))) < 10:
+            issues.append("Docker Compose check needs explanation when not passing")
+        if "docker compose" not in str(validation.get("command", "")):
+            issues.append("Docker Compose validation command must be recorded")
 
     # Gate progression and source evidence are explicit, not merely narrative.
     progress_name = outputs.get("discovery_progress")

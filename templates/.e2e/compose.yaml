@@ -1,0 +1,4 @@
+# SCAFFOLD ONLY: discovery must replace this with actual app and infrastructure services.
+# An empty services map fails the discovery quality gate.
+name: brownfield-e2e
+services: {}
