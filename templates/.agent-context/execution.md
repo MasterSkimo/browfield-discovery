@@ -20,9 +20,9 @@
 
 Do not treat commands discovered in README files as successfully executed.
 
-## Autonomous environment design (not implemented by discovery)
+## Autonomous environment design (implemented as Docker scaffold by discovery)
 
-Identify how the downstream agent should build application images in Docker, what dedicated E2E profiles or files must be introduced, which variables should be overridden in Compose, and any health/start dependencies. Distinguish declared commands from observed execution. Cross-reference `environment-blueprint.md`.
+Create actual `.e2e/compose.yaml` and required Dockerfiles/profile files/overrides, using source-grounded build contexts and environmental wiring. Keep developer configuration untouched and record source evidence. Distinguish declared commands from observed execution. Cross-reference `environment-blueprint.md`.
 
 ## Discovery-created E2E runtime
 

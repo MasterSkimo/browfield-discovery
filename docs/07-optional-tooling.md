@@ -32,7 +32,7 @@ The script does not initialize repositories, run database migrations, record or 
 
 Cursor receives its custom subagent in .cursor/agents and slash command in .cursor/commands; OpenCode v2 receives its agent in .opencode/agents and slash command in .opencode/commands. Both reuse the *same* SKILL.md files in .agents/skills; the discovery templates, schema, investigation protocol and non-mutating quality checker are copied to .agents/brownfield-discovery.
 
-Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files by default: identical copies are ignored and customized copies become reported conflicts. Add --upgrade-agent-files only when you want to update previously installed brownfield resources; the installer creates a uniquely named .brownfield.bak file before replacing each existing file, and never follows destination symlinks. The target's AGENTS.md is not created or changed during installation.
+Scope global installs under the appropriate home directory. Scope project requires an explicit --target and writes only to that repository's agent/skill directories. It never replaces existing files by default: identical copies are ignored and customized copies become reported conflicts. Add --upgrade-agent-files only when you want to update previously installed brownfield resources; the installer creates a uniquely named .brownfield.bak file before replacing each existing file, and never follows destination symlinks. The target's AGENTS.md and Docker files are **not created or changed by the installer**; the installed discovery agent creates the project-specific `.e2e/` foundation when `/brownfield-discover` is invoked.
 
 Cursor user-level skills in ~/.agents/skills are available to local sessions. For Cursor Cloud Agents and remote workers, install project-scoped skills into the repository (or follow Cursor's explicit skill sync mechanism).
 
@@ -40,7 +40,7 @@ Cursor user-level skills in ~/.agents/skills are available to local sessions. Fo
 
 Run /brownfield-discover in the target repository from the Cursor or OpenCode agent interface. In T3 Code, choose the OpenCode provider and put /brownfield-discover at the very start of the message. Reload provider configuration / restart the agent session after first installation if needed. OpenCode also supports a direct noninteractive invocation with opencode run --agent brownfield-discovery followed by the full-discovery prompt.
 
-The discovery quality gate is .agents/brownfield-discovery/scripts/validate_discovery.py --project . (invoke with Python 3.10+). A gate failure is an incomplete discovery, not a successful handoff.
+The discovery quality gate is .agents/brownfield-discovery/scripts/validate_discovery.py --project . (invoke with Python 3.10+). It checks the generated `.e2e/compose.yaml`, source builds, safe env example and validation status as well as AGENTS.md and context; PyYAML (optional on developer machines, installed in CI) strengthens YAML/source-build checks. A gate failure is an incomplete discovery, not a successful handoff.
 
 ## MCP integration
 

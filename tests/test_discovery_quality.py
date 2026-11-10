@@ -230,6 +230,21 @@ class GateTests(unittest.TestCase):
             )
             self.assertTrue(any("blocks E2E handoff" in e for e in gate.collect_problems(root)))
 
+    def test_bad_compose_dockerfile_path_rejected(self) -> None:
+        # Docker build declarations must point to a real Dockerfile in the checkout.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            make_fixture(root)
+            compose = root / ".e2e/compose.yaml"
+            compose.write_text(
+                "services:\n  app:\n    build:\n      context: ..\n"
+                "      dockerfile: .e2e/docker/nonexistent.Dockerfile\n", encoding="utf-8"
+            )
+            # The CI test environment includes PyYAML for service and Dockerfile checks.
+            if gate.yaml is None:
+                self.skipTest("PyYAML is not installed")
+            self.assertTrue(any("Dockerfile is missing" in e for e in gate.collect_problems(root)))
+
     def test_unreplaced_template_fails(self) -> None:
         # A generated guide cannot retain authoring placeholders.
         with tempfile.TemporaryDirectory() as temp:

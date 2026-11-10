@@ -6,7 +6,7 @@ description: Assemble concise AGENTS.md instructions, discovery manifest, eviden
 ## Procedure
 
 1. Review discovered facts and make their sources and confidence inspectable.
-2. Generate a minimal `AGENTS.md`: repository orientation, module boundaries, conventions, links, safe execution hints and proof obligations.
+2. Generate a substantive, directly actionable `AGENTS.md` with source-based working directories, actual setup/build/run/test commands, module boundaries, conventions, safe E2E Docker invocation and proof obligations; links are supplemental.
 3. Store details under `.agent-context/`; use links instead of duplicating long inventories. Use templates/schemas from `.agents/brownfield-discovery/` when the package is installed by setup.py.
 4. Provide `verification-contract.md` for AC -> changes -> automated assertions -> execution artifacts -> outcome.
 5. Complete `manifest.json` with analyzed revision, actual artifact paths, findings and status; never leave template placeholders in completed output.
