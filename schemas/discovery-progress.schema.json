@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MasterSkimo/browfield-discovery/blob/main/schemas/discovery-progress.schema.json",
+  "title": "Brownfield discovery progress with interactive D7 (v0.2 proposal)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "phases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 7
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D0"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D1"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D2"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D3"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D4"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D5"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D6"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "status",
+            "evidence",
+            "blockers"
+          ],
+          "properties": {
+            "id": {
+              "const": "D7"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "in_progress",
+                "done",
+                "blocked",
+                "awaiting_user"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "blockers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "items": false
+    }
+  }
+}

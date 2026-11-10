@@ -1,0 +1,6 @@
+# Local indexes and memory data
+__pycache__/
+.pytest_cache/
+graphify-out/
+.mempalace/
+.basic-memory/

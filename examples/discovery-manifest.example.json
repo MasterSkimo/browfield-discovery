@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "repository": {
+    "name": "example/orders-app",
+    "revision": "0123456789abcdef0123456789abcdef01234567",
+    "analyzed_at": "2026-11-07T00:00:00Z"
+  },
+  "status": "needs_investigation",
+  "outputs": {
+    "agent_instructions": "AGENTS.md",
+    "architecture": ".agent-context/architecture.md",
+    "execution": ".agent-context/execution.md",
+    "dependencies": ".agent-context/dependencies.md",
+    "e2e_inventory": ".agent-context/e2e-inventory.md",
+    "unknowns": ".agent-context/unknowns.md",
+    "verification_contract": ".agent-context/verification-contract.md",
+    "environment_blueprint": ".agent-context/environment-blueprint.md",
+    "discovery_progress": ".agent-context/discovery-progress.json",
+    "compose_file": ".e2e/compose.yaml",
+    "env_example": ".e2e/.env.e2e.example",
+    "local_ignore": ".e2e/.gitignore",
+    "clarifications": ".agent-context/clarifications.md"
+  },
+  "findings": [
+    {
+      "id": "ARC-1",
+      "statement": "Example only: sample service declares an HTTP entry point.",
+      "confidence": "verified",
+      "sources": [
+        {
+          "path": "sample-api.yaml",
+          "locator": "paths:/orders"
+        }
+      ]
+    },
+    {
+      "id": "DEP-1",
+      "statement": "Example only: external payment behavior not yet confirmed.",
+      "confidence": "unresolved",
+      "sources": []
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "ACT-1",
+      "category": "investigation",
+      "description": "Example only: inspect payment adapter contract before building stub.",
+      "finding_ids": [
+        "DEP-1"
+      ],
+      "searched_sources": [
+        "src/integrations/PaymentClient.java",
+        "src/test/PaymentClientTest.java"
+      ],
+      "hypothesis": "The payment adapter depends on a third-party HTTP contract",
+      "why_unresolved": "External contract details cannot be confirmed from the example inputs."
+    }
+  ],
+  "docker_validation": {
+    "status": "not_run",
+    "command": "docker compose -f .e2e/compose.yaml --env-file .e2e/.env.e2e.example config --quiet",
+    "reason": "Illustrative example; Docker Compose was not invoked."
+  }
+}

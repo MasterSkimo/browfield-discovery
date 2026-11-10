@@ -1,0 +1,3 @@
+# Contract validation only; runtime discovery itself has no Python dependency.
+jsonschema>=4.23,<5
+PyYAML>=6.0,<7  # Compose syntax checks in the discovery quality validator

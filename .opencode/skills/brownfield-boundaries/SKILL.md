@@ -1,0 +1,30 @@
+---
+name: brownfield-boundaries
+description: Classify application boundaries, databases, message brokers, auth, and external systems requiring stubs for autonomous E2E setup.
+---
+
+## Procedure
+
+1. Find database clients/configuration and schema/migration sources; record engines, version hints, database names and safe config **keys**.
+2. Find broker clients, messaging topology declarations, subscribers, producers, and retry/dead-letter hints.
+3. Identify *application-owned* components versus services outside the application test boundary. Do not mock application behavior.
+4. For every external boundary identify protocol, URLs/configuration keys, auth type, contracts/schemas and success/error semantics if evidenced.
+5. Map environment variables, profiles, ports, health endpoints and credential **names** without recording values.
+6. Flag dynamic wiring and unconfirmed Graphify relationships as inferred, not verified.
+7. Write `.agent-context/dependencies.md` and unresolved seams in `unknowns.md`.
+
+## Deep exploration requirements
+
+Triangulate dependency identity and version from package manifests, configuration, client factories, migrations, deployment and tests. Derive likely Docker DB/broker topology even if no Compose exists, with confidence=INFERRED. Trace external client call sites to request/response shape, auth and observable errors. Distinguish absent implementation from absent README. Every unknown requires a recorded search trail, strongest hypothesis and blocker.
+
+## Classification
+
+Use `application`, `docker-db`, `docker-messaging`, `external-stub` or `unresolved`. Missing contracts/data/auth do not make a dependency impossible to test; create targeted follow-up work.
+
+## Compose-first topology evidence
+
+Record how the full application could run as real containers plus DB/broker and outside-service stubs. Look for env-based endpoint overrides, existing runtime profiles, build contexts, network aliases and health checks. Assume neither a human IDE workflow nor access to developer databases. Hand these findings to brownfield-runtime-topology so discovery can **create** the dedicated `.e2e/compose.yaml` and isolated E2E configuration. Do not edit existing developer Compose or app profiles.
+
+## Dedicated Docker scaffold ownership
+
+Discovery must reflect detected databases, brokers and external boundaries in real `.e2e/compose.yaml` service definitions/configuration, with environment overrides and isolated runtime profiles where needed. The E2E agent later implements stub behavior; do not leave unbounded production network calls. Do not modify developer Compose/profiles.

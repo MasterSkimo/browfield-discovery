@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MasterSkimo/browfield-discovery/blob/main/schemas/discovery-manifest.schema.json",
+  "title": "Brownfield discovery manifest v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "status",
+    "outputs",
+    "findings",
+    "next_actions",
+    "docker_validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "revision",
+        "analyzed_at"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 7
+        },
+        "analyzed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "ready_for_e2e_setup",
+        "needs_investigation",
+        "awaiting_user_clarification"
+      ]
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_instructions",
+        "architecture",
+        "execution",
+        "dependencies",
+        "e2e_inventory",
+        "unknowns",
+        "verification_contract",
+        "environment_blueprint",
+        "discovery_progress",
+        "compose_file",
+        "env_example",
+        "local_ignore",
+        "clarifications"
+      ],
+      "properties": {
+        "agent_instructions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "architecture": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependencies": {
+          "type": "string",
+          "minLength": 1
+        },
+        "e2e_inventory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unknowns": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification_contract": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment_blueprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "discovery_progress": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compose_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "env_example": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_ignore": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clarifications": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    },
+    "docker_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_run"
+          ]
+        },
+        "command": {
+          "type": "string",
+          "minLength": 10
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "fail",
+                  "not_run"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "minLength": 10
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "locator"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "statement",
+        "confidence",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]+$"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "enum": [
+            "verified",
+            "inferred",
+            "unresolved"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "reasoning": {
+          "type": "string",
+          "minLength": 25
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "confidence": {
+                "const": "verified"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "sources": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "confidence": {
+                "const": "inferred"
+              }
+            },
+            "required": [
+              "confidence"
+            ]
+          },
+          "then": {
+            "required": [
+              "reasoning"
+            ],
+            "properties": {
+              "sources": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]+-[0-9]+$"
+        },
+        "category": {
+          "enum": [
+            "environment",
+            "stub",
+            "data",
+            "identity",
+            "test",
+            "investigation",
+            "developer-question"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]+-[0-9]+$"
+          },
+          "uniqueItems": true
+        },
+        "searched_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "hypothesis": {
+          "type": "string",
+          "minLength": 12
+        },
+        "why_unresolved": {
+          "type": "string",
+          "minLength": 20
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "enum": [
+                  "investigation",
+                  "developer-question"
+                ]
+              }
+            },
+            "required": [
+              "category"
+            ]
+          },
+          "then": {
+            "required": [
+              "searched_sources",
+              "hypothesis",
+              "why_unresolved"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

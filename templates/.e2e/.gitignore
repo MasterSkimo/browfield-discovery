@@ -1,0 +1,4 @@
+# Private E2E test-run values and credentials remain outside Git.
+.env.e2e.local
+*.secret
+*.secrets.*

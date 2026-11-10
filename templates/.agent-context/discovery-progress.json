@@ -1,0 +1,62 @@
+{
+  "schema_version": "0.1.0",
+  "revision": "REVISION_REPLACE_WITH_REAL_SHA",
+  "phases": [
+    {
+      "id": "D0",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D1",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D2",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D3",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D4",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D5",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D6",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D7",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    }
+  ]
+}
