@@ -24,10 +24,10 @@ Specify naming conventions, organization, DI/security/transaction patterns, erro
 List where credentials are referenced (only **names**, not values), how local profiles/identities are selected and safe fixture/test-data requirements. Never paste secrets or personal data.
 
 ## First autonomous mission: E2E characterization
-Describe the scope of the existing application's **real** UI/backend modules; Docker DB/brokers; external services to stub; identity/fixture needs; Playwright for UI, Newman for API-only, and assertions on async outcomes. The baseline must capture observed current behavior without conflating it with intended requirements. Link to the inventory for scenario details.
+Do **not** assume the future agent will start services as a human developer through an IDE. Prefer a single reproducible **Docker Compose** project that builds and runs all real application backends, frontends, workers and consumers, alongside Docker DB/brokers and stubs for every external boundary. Detail existing build definitions and profiles; explicitly permit separate E2E application configuration files and environment-variable overrides instead of modifying developer profiles. Use Compose profiles for optional tooling, not as a substitute for application runtime profiles. Provide known service DNS, ports, health, seeds/reset, identity and fixtures. Describe Playwright UI, Newman API-only, and async assertions. Link to the source-backed environment blueprint and behavior inventory. This is an information handoff, not a claim that containers or tests exist.
 
 ## Evidence and delivery
 For each downstream request, connect acceptance criterion -> implementation path -> automated check/assertions -> command + environment + artifact -> result (pass/fail/not_run). Separate pre-existing failures and regressions. Do not report unexecuted tests as passing. Follow the verification contract.
 
 ## Detailed reference material
-Link only to source-backed context files (architecture, execution, dependencies, E2E inventory, unknowns, verification contract). The core work instructions above must stand on their own.
+Link only to source-backed context files (architecture, execution, dependencies, environment blueprint, discovery progress, E2E inventory, unknowns, verification contract). The core work instructions above must stand on their own.

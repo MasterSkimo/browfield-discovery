@@ -25,6 +25,7 @@ SKILLS = (
     "brownfield-inference",
     "brownfield-repository",
     "brownfield-boundaries",
+    "brownfield-runtime-topology",
     "brownfield-e2e-readiness",
     "brownfield-handoff",
 )

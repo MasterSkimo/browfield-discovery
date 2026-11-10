@@ -20,3 +20,7 @@ Triangulate dependency identity and version from package manifests, configuratio
 ## Classification
 
 Use `application`, `docker-db`, `docker-messaging`, `external-stub` or `unresolved`. Missing contracts/data/auth do not make a dependency impossible to test; create targeted follow-up work.
+
+## Compose-first topology evidence
+
+Record how the full application could run as real containers plus DB/broker and outside-service stubs. Look for env-based endpoint overrides, existing runtime profiles, build contexts, network aliases and health checks. Assume neither a human IDE workflow nor access to developer databases. Hand the results to brownfield-runtime-topology; do not create Compose files.

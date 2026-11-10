@@ -13,7 +13,9 @@
     "dependencies": ".agent-context/dependencies.md",
     "e2e_inventory": ".agent-context/e2e-inventory.md",
     "unknowns": ".agent-context/unknowns.md",
-    "verification_contract": ".agent-context/verification-contract.md"
+    "verification_contract": ".agent-context/verification-contract.md",
+    "environment_blueprint": ".agent-context/environment-blueprint.md",
+    "discovery_progress": ".agent-context/discovery-progress.json"
   },
   "findings": [
     {

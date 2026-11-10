@@ -1,0 +1,57 @@
+{
+  "schema_version": "0.1.0",
+  "revision": "0123456789abcdef0123456789abcdef01234567",
+  "phases": [
+    {
+      "id": "D0",
+      "status": "done",
+      "evidence": [
+        "pom.xml"
+      ],
+      "blockers": [],
+      "notes": "Illustrative repository inventory; no runtime execution"
+    },
+    {
+      "id": "D1",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D2",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D3",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D4",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D5",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    },
+    {
+      "id": "D6",
+      "status": "pending",
+      "evidence": [],
+      "blockers": [],
+      "notes": ""
+    }
+  ]
+}

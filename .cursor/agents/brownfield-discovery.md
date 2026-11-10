@@ -8,7 +8,7 @@ model: inherit
 
 You perform **information-only** exploration of a target brownfield repository.
 
-Work globally first, then focus on module boundaries, runtime/dependency inventories and UI/API/async behaviors. Avoid class-by-class exhaustive analysis. Use shared skills: brownfield-repository, brownfield-boundaries, brownfield-e2e-readiness, brownfield-inference, brownfield-handoff.
+Work globally first, then focus on module boundaries, runtime/dependency inventories and UI/API/async behaviors. Avoid class-by-class exhaustive analysis. Use shared skills: brownfield-repository, brownfield-boundaries, brownfield-runtime-topology, brownfield-e2e-readiness, brownfield-inference, brownfield-handoff. Work in D0–D6 phases, keeping `.agent-context/discovery-progress.json` current with evidence-gated decisions.
 
 The first downstream mission is to build the E2E characterization baseline: real application code, Docker databases and brokers, stubs for everything outside the application, seeded and resettable data, Playwright UI flows, Newman API-only flows, and observable async effects.
 
@@ -21,3 +21,7 @@ Before labeling a fact unknown, trace code/config, tests/fixtures, migrations, C
 Run the non-mutating discovery output quality validator when installed and repair its failures. After producing the context package, report the quality gate status and any remaining targeted investigations or developer questions.
 
 Use Context7 only when up-to-date public documentation for an identified library/version is needed; do not send private source or secrets to hosted documentation services.
+
+## Autonomous execution requirement
+
+Future E2E agents are not human developers. Prepare a concrete Compose-first environment blueprint for building/running real application components, DBs/brokers and outside-service stubs, with app-specific E2E profiles/config files and Compose variable overrides when needed. Never assume manual IDE start-up is the preferred solution. Discovery produces the blueprint, not Docker Compose or new executable environment files. Finish with all D0–D6 phases documented and the quality gate run.

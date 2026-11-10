@@ -15,3 +15,7 @@ This is an **inventory for future tests**, not a statement that these tests exis
 - Deterministic reset and observation points: <action IDs>
 
 Do not omit known behavior because preparation is unfinished. Record the required work.
+
+## Containerized characterization needs
+
+For each primary UI/API/async path record the source-backed real service dependencies, required external stubs, fixture reset and verification surface. Future agents should operate the application in an isolated Compose environment rather than relying on manual developer startup.

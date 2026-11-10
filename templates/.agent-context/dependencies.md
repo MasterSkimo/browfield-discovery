@@ -18,3 +18,7 @@
 
 ## Unknowns
 - <links to unknowns.md items>
+
+## Intended autonomous runtime
+
+Identify whether each **real** application component can be built/run in a full-stack Compose project. List database/broker containers, external stubs and dependencies, including profile/config keys and source evidence. Do not assume developer-hosted infrastructure or IDE processes. See `environment-blueprint.md` for the Compose-first handoff.

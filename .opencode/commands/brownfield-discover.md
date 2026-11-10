@@ -6,7 +6,7 @@ subagent: false
 
 Perform the COMPLETE brownfield discovery from this repository root, rather than answering with a plan. Optional focus/constraints: $ARGUMENTS
 
-Load all brownfield skills, including brownfield-inference. Continue through repository mapping, runtime/integration boundary reconstruction, representative UI/API/async tracing, cross-source inference, E2E readiness and AGENTS.md delivery.
+Follow the full D0–D6 evidence-gated workflow and update discovery-progress.json as each phase completes. Load all brownfield skills, including brownfield-runtime-topology and brownfield-inference. Continue through repository mapping, runtime/integration boundary reconstruction, representative UI/API/async tracing, cross-source inference, E2E readiness and AGENTS.md delivery.
 
 Before declaring anything unknown, investigate its implementation, configuration, tests and CI/deploy evidence; write the strongest bounded inference when supported. Do not read every class or change application code.
 

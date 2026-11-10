@@ -6,9 +6,9 @@ The *discovery* agent reconstructs actionable, source-backed information; the *n
 
 | Component | Downstream treatment | Discovery information to locate |
 | --- | --- | --- |
-| Application frontends and backends | Run the real components | modules, build/start commands, ports, configuration, healthchecks |
-| Databases | Docker services | engines/versions, schemas, migrations, schemas/collections, initial data |
-| Messaging | Docker services | brokers, topology, queues/topics, producers/consumers, failure/retry handling |
+| Application frontends and backends | Build/run real components through a single Compose project where feasible | build contexts, Dockerfile needs, runtime profiles, ports, config, healthchecks |
+| Databases | Docker Compose services | engines/versions, schemas, migrations, schemas/collections, initial data |
+| Messaging | Docker Compose services | brokers, topology, queues/topics, producers/consumers, failure/retry handling |
 | Outside-application services | Stub at the boundary | endpoints, protocols, auth, contracts, typical success/error responses |
 | Identity provider | Real or simulated identity boundary suitable for the test | auth flows, roles, tokens, local fixtures and callback configuration |
 | Data | Deterministic fixtures/seed/reset | migration/seed assets, invariants, records and dependencies |
@@ -37,3 +37,7 @@ The discovery agent must not create a Docker Compose environment, write seed scr
 ## Deeper investigation expectation
 
 The discovery agent must trace representative frontend routes through API calls, server behavior and state/event observations, and APIs through auth, data and external contracts. It should infer environment requirements from source, tests, config, CI and migrations even where no Docker or E2E configuration exists. Reserve 'unknown' for evidence gaps after investigation, and preserve the reasoning chain in the manifest and unknowns ledger.
+
+## Autonomous runtime strategy
+
+The future E2E agent should not follow a human developer setup by default (IDE, individually launched apps, manually provisioned DB or broker). Prefer a single Docker Compose project that builds all in-scope app images from the source checkout and runs supporting DB/broker/stub services; optional profiles select test runners or debug tools. Application-specific E2E profiles/files may be created separately from developer configuration and wired with Compose environment variables and env_file as necessary. The discovery agent identifies exact candidates, sources and constraints in `.agent-context/environment-blueprint.md` but does not implement them. See [the runtime contract](10-compose-first-handoff.md).

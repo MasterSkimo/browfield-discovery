@@ -34,10 +34,13 @@ class SetupTests(unittest.TestCase):
             self.assertTrue((root / ".opencode/agents/brownfield-discovery.md").is_file())
             self.assertTrue((root / ".agents/skills/brownfield-handoff/SKILL.md").is_file())
             self.assertTrue((root / ".agents/skills/brownfield-inference/SKILL.md").is_file())
+            self.assertTrue((root / ".agents/skills/brownfield-runtime-topology/SKILL.md").is_file())
             self.assertTrue((root / ".cursor/commands/brownfield-discover.md").is_file())
             self.assertTrue((root / ".opencode/commands/brownfield-discover.md").is_file())
             self.assertTrue((root / ".agents/brownfield-discovery/scripts/validate_discovery.py").is_file())
             self.assertTrue((root / ".agents/brownfield-discovery/templates/AGENTS.md").is_file())
+            self.assertTrue((root / ".agents/brownfield-discovery/templates/.agent-context/environment-blueprint.md").is_file())
+            self.assertTrue((root / ".agents/brownfield-discovery/schemas/discovery-progress.schema.json").is_file())
             self.assertTrue((root / ".agents/brownfield-discovery/schemas/task-evidence.schema.json").is_file())
 
     def test_idempotence_and_customization(self) -> None:

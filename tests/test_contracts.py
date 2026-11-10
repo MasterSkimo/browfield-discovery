@@ -22,7 +22,7 @@ class ContractTests(unittest.TestCase):
 
     def test_json_schemas_are_valid(self) -> None:
         # Check schema declarations before trying to validate any examples.
-        for schema_name in ("discovery-manifest", "task-evidence"):
+        for schema_name in ("discovery-manifest", "discovery-progress", "task-evidence"):
             schema = load_json(f"schemas/{schema_name}.schema.json")
             Draft202012Validator.check_schema(schema)
 
@@ -47,6 +47,9 @@ class ContractTests(unittest.TestCase):
         self.assertTrue(agent.startswith("---\n"))
         self.assertIn("mode: all", agent)
 
+        # The discovery agent must be explicit about the Compose-first downstream handoff.
+        self.assertIn("brownfield-runtime-topology", agent)
+        self.assertIn("discovery-progress.json", agent)
         # Both provider-specific commands must invoke the complete discovery.
         opencode_command = ROOT / ".opencode/commands/brownfield-discover.md"
         cursor_command = ROOT / ".cursor/commands/brownfield-discover.md"
@@ -56,6 +59,7 @@ class ContractTests(unittest.TestCase):
         expected_ids = (
             "brownfield-inference",
             "brownfield-repository",
+            "brownfield-runtime-topology",
             "brownfield-boundaries",
             "brownfield-e2e-readiness",
             "brownfield-handoff",

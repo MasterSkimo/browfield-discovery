@@ -22,6 +22,8 @@ OUTPUTS = {
     "e2e_inventory": ".agent-context/e2e-inventory.md",
     "unknowns": ".agent-context/unknowns.md",
     "verification_contract": ".agent-context/verification-contract.md",
+    "environment_blueprint": ".agent-context/environment-blueprint.md",
+    "discovery_progress": ".agent-context/discovery-progress.json",
 }
 
 
@@ -39,18 +41,38 @@ def make_fixture(root: Path) -> dict:
         "Tests and quality checks": f"From root, declared but not executed: {tick}mvn test{tick}. Check test sources and CI configuration before handoff.",
         "Architecture and code conventions": "Controller code is under src/Controller.java. Follow established Java package organization and validation conventions.",
         "Security and data handling": "Use only environment variable names, no credentials. Determine test role requirements from application auth code and fixtures.",
-        "First autonomous mission: E2E characterization": "Run the real application, Docker databases and brokers, stub outside-application services, then exercise real API with Newman assertions.",
+        "First autonomous mission: E2E characterization": "Build/run the real application via Docker Compose, alongside database and broker services, stub outside-application systems and use Newman for real API assertions.",
         "Evidence and delivery": "Every acceptance criterion links implementation, automated assertion, command, environment, run artifact and pass/fail status.",
         "Detailed reference material": "See .agent-context/e2e-inventory.md for candidate journeys, architecture.md for topology and verification-contract.md for proof requirements.",
     }
     text = "# AGENTS.md — Sample API\n\n" + "\n\n".join(f"## {title}\n{body}" for title, body in sections.items())
     (root / "AGENTS.md").write_text(text, encoding="utf-8")
     for name, path in OUTPUTS.items():
-        if name == "agent_instructions":
+        if name in ("agent_instructions", "discovery_progress"):
             continue
         f = root / path
         f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text("# Context\nInspected code reference from pom.xml.\n", encoding="utf-8")
+        if name == "environment_blueprint":
+            f.write_text(
+                "# Compose blueprint\n"
+                "Build real Maven application from pom.xml. Use a containerized database and broker, "
+                "external stub boundaries, an application e2e profile and dedicated environment variables; "
+                "include seed/reset, health and test runner requirements.\n",
+                encoding="utf-8",
+            )
+        else:
+            f.write_text("# Context\nInspected code reference from pom.xml.\n", encoding="utf-8")
+    # A complete readiness claim requires seven sequential phase gates with file evidence.
+    progress = {
+        "schema_version": "0.1.0",
+        "revision": "0123456789abcdef",
+        "phases": [
+            {"id": f"D{i}", "status": "done", "evidence": ["pom.xml"],
+             "blockers": [], "notes": "Example fixture evidence only"}
+            for i in range(7)
+        ],
+    }
+    (root / OUTPUTS["discovery_progress"]).write_text(json.dumps(progress), encoding="utf-8")
     manifest = {
         "schema_version": "0.1.0",
         "repository": {"name": "sample", "revision": "0123456789abcdef", "analyzed_at": "2026-11-10T10:00:00Z"},
@@ -115,6 +137,41 @@ class GateTests(unittest.TestCase):
             errors = gate.collect_problems(root)
             self.assertTrue(any("reasoning" in x for x in errors))
             self.assertTrue(any("unsafe" in x for x in errors))
+
+
+    def test_incomplete_workflow_blocks_ready(self) -> None:
+        # Discovery cannot claim readiness until all seven gates are finished.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            make_fixture(root)
+            path = root / OUTPUTS["discovery_progress"]
+            progress = json.loads(path.read_text(encoding="utf-8"))
+            progress["phases"][2]["status"] = "pending"
+            progress["phases"][2]["evidence"] = []
+            path.write_text(json.dumps(progress), encoding="utf-8")
+            errors = gate.collect_problems(root)
+            self.assertTrue(any("all D0-D6 gates" in x for x in errors))
+            self.assertTrue(any("completed after an incomplete" in x for x in errors))
+
+    def test_phase_evidence_is_required(self) -> None:
+        # An unchecked or unsupported phase cannot be marked done.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            make_fixture(root)
+            path = root / OUTPUTS["discovery_progress"]
+            progress = json.loads(path.read_text(encoding="utf-8"))
+            progress["phases"][1]["evidence"] = []
+            path.write_text(json.dumps(progress), encoding="utf-8")
+            self.assertTrue(any("done without source evidence" in x for x in gate.collect_problems(root)))
+
+    def test_environment_blueprint_must_describe_compose(self) -> None:
+        # A generic dependency note is not a Compose-first implementation handoff.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            make_fixture(root)
+            path = root / OUTPUTS["environment_blueprint"]
+            path.write_text("# Later\nTBD\n", encoding="utf-8")
+            self.assertTrue(any("environment blueprint" in x for x in gate.collect_problems(root)))
 
     def test_unreplaced_template_fails(self) -> None:
         # A generated guide cannot retain authoring placeholders.

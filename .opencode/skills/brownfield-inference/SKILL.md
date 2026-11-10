@@ -21,3 +21,7 @@ Examples:
 - Browser route + HTTP client + backend endpoint => candidate UI E2E flow; use tests/authorization config to infer preconditions.
 
 The skill does not modify application files, start infrastructure, create test data or write Playwright/Newman suites.
+
+## Docker-oriented deduction
+
+If README tells developers to manually start apps or services, cross-check CI/build/containers to deduce how a downstream agent can build them as images. Infer E2E profile names/variable overrides only with configuration evidence; propose dedicated test configuration when existing profiles are unsuitable. A missing existing Compose file is not an unknown runtime architecture.

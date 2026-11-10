@@ -19,8 +19,9 @@ SECTIONS = (
 OUTPUTS = (
     "agent_instructions", "architecture", "execution", "dependencies",
     "e2e_inventory", "unknowns", "verification_contract",
+    "environment_blueprint", "discovery_progress",
 )
-PLACEHOLDER = re.compile(r"\{\{[^}]+\}\}|<PROJECT NAME>|<ADD ONLY|<SOURCE-BACKED", re.IGNORECASE)
+PLACEHOLDER = re.compile(r"\{\{[^}]+\}\}|<PROJECT NAME>|<ADD ONLY|<SOURCE-BACKED|\bPROJECT_NAME\b|\bAPP_MODULES_WITH_PATHS\b|\bEVIDENCE_AND_ACTIONS\b|\bREVISION_REPLACE_WITH_REAL_SHA\b", re.IGNORECASE)
 HEADING = re.compile(r"(?m)^#{2,3}\s+(.+?)\s*$")
 
 
@@ -73,6 +74,9 @@ def collect_problems(project: Path) -> list[str]:
         issues.append("AGENTS.md too short for substantive instructions")
     if PLACEHOLDER.search(agent):
         issues.append("AGENTS.md contains template placeholders")
+    e2e_section = headings.get("first autonomous mission: e2e characterization", "").lower()
+    if "compose" not in e2e_section or "build" not in e2e_section:
+        issues.append("AGENTS.md must instruct agents to build/run the full real application via Compose")
     if "declared" not in agent.lower() and "observed" not in agent.lower():
         issues.append("AGENTS.md omits declared versus observed command status")
     # Backticked shell commands or fenced blocks must appear in operational sections.
@@ -102,6 +106,62 @@ def collect_problems(project: Path) -> list[str]:
                     issues.append(f"output has placeholders: {path}")
             except UnicodeError:
                 issues.append(f"output not readable as UTF-8: {path}")
+    # A build-first environment blueprint must be more than a file name.
+    blueprint_name = outputs.get("environment_blueprint")
+    blueprint_file = under_project(project, blueprint_name) if isinstance(blueprint_name, str) else None
+    if blueprint_file and blueprint_file.is_file():
+        blueprint_text = blueprint_file.read_text(encoding="utf-8").lower()
+        if not all(word in blueprint_text for word in ("compose", "build", "profile", "stub", "environment", "database", "broker")):
+            issues.append("environment blueprint lacks full-stack Compose/build/config/boundary details")
+        if len(blueprint_text.strip()) < 250:
+            issues.append("environment blueprint is too short for actionable setup planning")
+
+    # Gate progression and source evidence are explicit, not merely narrative.
+    progress_name = outputs.get("discovery_progress")
+    progress_file = under_project(project, progress_name) if isinstance(progress_name, str) else None
+    if progress_file and progress_file.is_file():
+        try:
+            progress = json.loads(progress_file.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError):
+            progress = None
+            issues.append("invalid discovery progress JSON")
+        if not isinstance(progress, dict):
+            issues.append("discovery progress must be an object")
+        else:
+            revision = manifest.get("repository", {}).get("revision") if isinstance(manifest.get("repository"), dict) else None
+            if progress.get("revision") != revision:
+                issues.append("discovery progress revision does not match analyzed manifest revision")
+            phases = progress.get("phases")
+            required_ids = [f"D{i}" for i in range(7)]
+            if not isinstance(phases, list) or [x.get("id") if isinstance(x, dict) else None for x in phases] != required_ids:
+                issues.append("discovery progress phases must be ordered D0-D6")
+            else:
+                seen_incomplete = False
+                for phase in phases:
+                    pid = phase["id"]
+                    status = phase.get("status")
+                    evidence = phase.get("evidence")
+                    blockers = phase.get("blockers")
+                    if status not in ("pending", "in_progress", "done", "blocked"):
+                        issues.append(f"{pid}: invalid phase status")
+                    if status == "done":
+                        if seen_incomplete:
+                            issues.append(f"{pid}: completed after an incomplete previous phase")
+                        if not isinstance(evidence, list) or not evidence:
+                            issues.append(f"{pid}: done without source evidence")
+                        else:
+                            for relative in evidence:
+                                path = under_project(project, relative) if isinstance(relative, str) else None
+                                if path is None or not path.is_file():
+                                    issues.append(f"{pid}: missing or unsafe phase evidence {relative}")
+                    else:
+                        seen_incomplete = True
+                    if status == "blocked" and (not isinstance(blockers, list) or not blockers):
+                        issues.append(f"{pid}: blocked without an explanation")
+                if manifest.get("status") == "ready_for_e2e_setup" and any(
+                    phase.get("status") != "done" for phase in phases
+                ):
+                    issues.append("ready_for_e2e_setup requires all D0-D6 gates complete")
     if outputs.get("agent_instructions") != "AGENTS.md":
         issues.append("agent_instructions must point to root AGENTS.md")
     if manifest.get("status") not in ("ready_for_e2e_setup", "needs_investigation"):

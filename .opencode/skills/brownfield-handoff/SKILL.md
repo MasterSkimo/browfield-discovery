@@ -21,3 +21,7 @@ AGENTS.md is a WORKING GUIDE, not a file index. It must directly include actual 
 ## Existing instructions
 
 Preserve `AGENTS.md` and module-specific rules already present. Add non-conflicting pointers if safe; otherwise document a merge proposal and notify the caller. Never silently replace rules or claim precedence over the existing project policy.
+
+## Workflow handoff
+
+Before completion, require D0–D6 progression with evidence in `.agent-context/discovery-progress.json`. Verify the Compose-first `.agent-context/environment-blueprint.md` describes all real apps, required DBs/brokers, outside-service stubs, profile/env wiring, readiness and fixture resets. Include the runtime strategy directly in AGENTS.md, while linking to the detailed blueprint. Never claim provisioning or build success that did not occur.

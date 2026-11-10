@@ -18,7 +18,7 @@ Success means the next agent can determine what exists, where to look, what it n
 ## Discovery owns
 
 - An agent instruction entrypoint and discoverable, compact references.
-- Runtime/dependency inventory and boundary classification.
+- Runtime/dependency inventory and boundary classification, plus a Compose-first full-application environment blueprint for downstream agents.
 - E2E inventory: journeys, endpoints, async triggers and observable effects, known roles/identities, relevant data, and follow-up tasks.
 - Required engineering evidence format and completion rules.
 - Transparent unknowns, conflicting evidence, and source revision/freshness.
@@ -26,7 +26,7 @@ Success means the next agent can determine what exists, where to look, what it n
 ## Discovery does not own
 
 - Build fixes, refactors, application code or infra changes.
-- Running or provisioning the entire stack, Docker, brokers or databases.
+- Running or provisioning the entire stack, Docker, brokers or databases. Future agents may do that through a dedicated Compose environment; discovery must supply the information rather than assuming manual IDE-based startup.
 - Implementing external service stubs or data seed scripts.
 - Writing Playwright/Newman suites or promising E2E coverage.
 - Inventing business requirements or producing exhaustive functional specifications.
@@ -39,3 +39,7 @@ Success means the next agent can determine what exists, where to look, what it n
 - Never state a tool or execution was successful if not observed.
 - Never discard a behavior because it seems difficult to test. Record prerequisite work.
 - Preserve existing target instructions; conflicts require a recorded recommendation, not silent replacement.
+
+## Discovery process
+
+Execute phases D0–D6 in [the proposed workflow](09-discovery-workflow.md), recording progress and source-backed phase gates. Complete an [environment blueprint](10-compose-first-handoff.md) before the E2E handoff. This is a reviewable process definition; it does not authorize discovery to create Docker Compose files or modify application configuration.

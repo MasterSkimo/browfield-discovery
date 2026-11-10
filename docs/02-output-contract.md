@@ -9,6 +9,8 @@ AGENTS.md                            # short, authoritative agent navigation and
   architecture.md                   # modules, entry points, important interactions
   execution.md                      # known build/start/config commands (not executed unless observed)
   dependencies.md                   # local infra vs outside-app systems, configs and stubbing clues
+  environment-blueprint.md          # downstream full-stack Compose design and E2E profiles/env
+  discovery-progress.json           # D0-D6 workflow gates, evidence and blockers
   e2e-inventory.md                  # UI/API/async behaviors, roles, data, expected observations
   unknowns.md                       # unresolved facts and recommended targeted investigations
   verification-contract.md          # task -> change -> test -> execution evidence rules
@@ -34,7 +36,7 @@ Before any unknown is recorded, follow [the investigation protocol](08-investiga
 
 ## Status semantics
 
-- **ready_for_e2e_setup**: enough information is available for another agent to start provisioning and E2E implementation; unknowns may remain as explicit work items.
+- **ready_for_e2e_setup**: all D0–D6 discovery gates completed with evidence, including a Compose-first plan that covers application builds, database/broker containers, outside-service stubs, configuration profiles and data. Unknowns may remain as explicit, investigated downstream tasks.
 - **needs_investigation**: critical entry points, boundaries, access assumptions, or configuration locations are still unlocated.
 
 Neither value means the application boots nor that E2E tests pass.
@@ -46,3 +48,7 @@ Neither value means the application boots nor that E2E tests pass.
 - Record the analyzed Git revision and warn when the current HEAD differs.
 - Sensitive values must never enter the context package. Use environment variable names or secret reference identifiers.
 - Generated files are project-specific outputs, not generic claims copied from the templates. Run the read-only gate scripts/validate_discovery.py against the target output before declaring the discovery complete; repair any reported defects.
+
+## Workflow and runtime blueprint requirements
+
+The process is defined in [phases D0–D6](09-discovery-workflow.md) and recorded in `.agent-context/discovery-progress.json`. The [Compose-first contract](10-compose-first-handoff.md) is represented by `.agent-context/environment-blueprint.md`: application-owned services must be built/run as real code, alongside isolated DB/brokers and outside-boundary stubs, with dedicated E2E profiles and environment variable mappings where appropriate. Do not assume that a developer's manual run instructions are the correct autonomous setup. Discovery creates an executable *plan*, not the containers themselves.

@@ -24,3 +24,12 @@
 Evaluate on (a) one backend/API repo, (b) one UI + backend repo, (c) one multi-service repo with DB and messaging. Compare a fresh E2E-bootstrap agent operating with and without the discovery outputs. Record exploration repetition, ability to identify services/stubs/data, and ungrounded assertions.
 
 This PR proposes these criteria; real brownfield acceptance runs are **not** claimed here.
+
+## Full-stack discovery handoff and phased workflow
+
+- [ ] D0–D6 phases have a recorded status and evidence; readiness is not claimed while phase gates are missing.
+- [ ] A Compose-first environment blueprint specifies all real application builds, DB/brokers, outside-boundary stubs, service DNS, health, E2E test runners, data/reset and isolation.
+- [ ] Distinguishes Compose service-selection profiles from application runtime profiles and documents separate E2E configurations / environment-variable overrides.
+- [ ] Does not assume a developer's IDE and manually started applications are the E2E execution strategy.
+- [ ] No Docker Compose, Dockerfile, fixture, stub or application environment file is created by the Discovery Agent; these belong to the downstream E2E-bootstrap task.
+- [ ] Phase gates are reviewed after deeper discoveries; evidence and source revision are consistent.

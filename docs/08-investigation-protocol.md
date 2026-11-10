@@ -55,3 +55,7 @@ python3 /path/to/browfield-discovery/scripts/validate_discovery.py --project /pa
 ~~~
 
 A failed quality gate requires repair of the discovery output, not a "discovery complete" claim. The gate checks structure and provenance, not runtime correctness; report any still-unknown limits honestly.
+
+## Runtime independence from developers
+
+Investigate whether all application components can be built and run from source inside a single Compose project, including frontends/backends, workers and scheduled consumers. Do not assume IDE launch configs are the preferred downstream approach. Identify app-specific E2E profiles/files and environment variable wiring without editing the project during discovery. Record Docker build context, service dependencies/healthchecks, container DNS, DB/broker topology, stub endpoints and seed/reset plan in the environment blueprint. If an existing production/development profile cannot be reused safely, describe a separate E2E config for downstream agents.

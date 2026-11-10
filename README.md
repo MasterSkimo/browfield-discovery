@@ -15,7 +15,7 @@ The first downstream mission is to build a reproducible E2E characterization bas
 - exercise UI journeys with Playwright and API-only journeys with Newman;
 - link observed behaviors, acceptance criteria, test executions, and evidence.
 
-The discovery agent gathers the information that makes that mission possible. It does not carry out the mission.
+The discovery agent gathers the information that makes that mission possible. It does not carry out the mission. The E2E-bootstrap agent is not expected to behave like a developer with IDE-launched components: its preferred target is a self-contained Docker Compose project that **builds and runs the real applications**, databases, brokers, external stubs and test runners as needed, with dedicated application profiles/config and environment overrides.
 
 ## What this proposal includes
 
@@ -26,6 +26,8 @@ The discovery agent gathers the information that makes that mission possible. It
 - [Acceptance criteria](docs/05-acceptance.md)
 - [Optional Graphify integration](docs/06-graphify.md)
 - [Investigation and inference protocol](docs/08-investigation-protocol.md)
+- [Proposed phased discovery workflow](docs/09-discovery-workflow.md)
+- [Compose-first E2E runtime contract](docs/10-compose-first-handoff.md)
 - OpenCode v2 agent: [.opencode/agents/brownfield-discovery.md](.opencode/agents/brownfield-discovery.md)
 - On-demand skills under [.opencode/skills](.opencode/skills)
 - Target-project output examples under [templates](templates)
@@ -42,7 +44,7 @@ After installing the agent and commands in the **target** project or globally:
 /brownfield-discover
 ~~~
 
-The command selects the full workflow and its source-backed inference skill. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
+The command follows phases D0–D6 from [the workflow](docs/09-discovery-workflow.md), records progress, prepares a Compose-first runtime blueprint and invokes source-backed inference. It must generate a working AGENTS.md that follows https://agents.md/ (real setup/build/run/test instructions, module boundaries, conventions and delivery rules), not a list of links.
 
 For noninteractive OpenCode runs from the target repository root:
 

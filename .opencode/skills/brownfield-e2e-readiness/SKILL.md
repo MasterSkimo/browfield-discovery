@@ -20,3 +20,7 @@ Do not stop after listing routes: follow representative browser action -> API ->
 ## Rules
 
 Do not generate Playwright/Newman tests, create containers, or seed data. Do not mark discovered behavior `untestable`. The next agent owns E2E implementation and assertions.
+
+## Runtime assumptions to reject
+
+Do not assume manual app boot via IDE, local Postgres/RabbitMQ or a developer's existing `.env`. The next agent should aim for one Compose project building actual apps, with separate E2E profiles/env overrides, deterministic data/reset and all out-of-boundary integrations stubbed. Reference the environment blueprint for each test candidate.
